@@ -1675,7 +1675,7 @@ async function initFirebase() {
       }
       setDbStatus(true);
       if (currentRole) {
-        syncFilters(); renderDashboard(); renderTable();
+        syncFilters(); reapplyDashFilter(); renderTable();
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('hidden');
       }
@@ -1686,7 +1686,7 @@ async function initFirebase() {
       // denied / fails after a successful login.
       const ls = document.getElementById('loading-screen');
       if (ls) ls.classList.add('hidden');
-      if (currentRole) { try { syncFilters(); renderDashboard(); renderTable(); } catch(_){} }
+      if (currentRole) { try { syncFilters(); reapplyDashFilter(); renderTable(); } catch(_){} }
     });
   } catch (e) {
     console.error('Firebase SDK failed to load — running in offline mode:', e);
@@ -1695,7 +1695,7 @@ async function initFirebase() {
     if (ls) ls.classList.add('hidden');
     const txt = document.getElementById('db-status-txt');
     if (txt) txt.textContent = 'Offline';
-    if (currentRole) { try { syncFilters(); renderDashboard(); renderTable(); } catch(_){} }
+    if (currentRole) { try { syncFilters(); reapplyDashFilter(); renderTable(); } catch(_){} }
   }
 }
 // Defer Firebase init to the end of the current task so that every
@@ -1820,7 +1820,7 @@ function applyRoleUI() {
         currentUser = user; currentRole = role;
         document.getElementById('login-screen').classList.add('hidden');
         applyRoleUI();
-        try { syncFilters(); renderDashboard(); renderTable(); } catch(_){}
+        try { syncFilters(); reapplyDashFilter(); renderTable(); } catch(_){}
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('hidden');
       }
@@ -2628,6 +2628,53 @@ function clearDashFilter() {
   syncDashToItems(null, null);
 }
 window.clearDashFilter = clearDashFilter;
+
+/* ══════════════════════════════════════════
+   RE-APPLY DASH FILTER (call after items update from Firebase)
+   ─ Re-runs the current filter criteria against the new items array.
+   ─ Keeps user's filter selection intact; simply refreshes the result set.
+══════════════════════════════════════════ */
+function reapplyDashFilter() {
+  // If no filter is active, just render with full items array
+  const dateFrom = (document.getElementById('dash-date-from') || {}).value || '';
+  const dateTo   = (document.getElementById('dash-date-to')   || {}).value || '';
+  const regional = (document.getElementById('dash-filter-regional') || {}).value || '';
+  const dept     = (document.getElementById('dash-filter-dept')     || {}).value || '';
+  const cls      = (document.getElementById('dash-filter-class')    || {}).value || '';
+  const store    = (document.getElementById('dash-filter-store')    || {}).value || '';
+
+  const hasFilter = dateFrom || dateTo || regional || dept || cls || store;
+
+  if (!hasFilter) {
+    // No filter active → clear any stale dashFilteredItems and render all
+    dashFilteredItems = null;
+    renderDashboard();
+    return;
+  }
+
+  // Re-apply the same filter logic against the updated items array
+  const fromMs = dateFrom ? new Date(dateFrom).setHours(0,0,0,0)   : null;
+  const toMs   = dateTo   ? new Date(dateTo).setHours(23,59,59,999) : null;
+
+  dashFilteredItems = items.filter(it => {
+    if (regional && it.regional !== regional) return false;
+    if (dept     && it.dept     !== dept)     return false;
+    if (cls      && it.cls      !== cls)      return false;
+    if (store    && (it.storeNum||it.store)   !== store) return false;
+    const ts = it.createdAt || it.updatedAt;
+    if (ts) {
+      const d = new Date(ts).getTime();
+      if (fromMs !== null && d < fromMs) return false;
+      if (toMs   !== null && d > toMs)   return false;
+    } else {
+      if (fromMs !== null || toMs !== null) return false;
+    }
+    return true;
+  });
+
+  renderDashboard();
+}
+window.reapplyDashFilter = reapplyDashFilter;
 
 /* ══════════════════════════════════════════
    RENDER DASHBOARD
