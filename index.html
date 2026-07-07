@@ -913,6 +913,42 @@
   .loading-spinner { width:40px; height:40px; border:3px solid #bfdbfe; border-top-color:#1d4ed8; border-radius:50%; animation:spin 0.8s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg)} }
   .loading-text { font-size:0.88rem; font-weight:600; color:var(--text2); letter-spacing:0.04em; }
+
+  /* ══ SETTINGS PAGE ══ */
+  .settings-page { padding:26px 30px; max-width:1100px; margin:0 auto; }
+  .settings-section { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:18px; box-shadow:var(--shadow); }
+  .settings-section-title { font-size:0.88rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:18px; display:flex; align-items:center; gap:8px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+  .settings-info-box { background:linear-gradient(135deg,#eff6ff,#f0f9ff); border:1px solid #bfdbfe; border-radius:10px; padding:14px 18px; margin-bottom:18px; font-size:0.82rem; color:#1e40af; line-height:1.6; }
+  .settings-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+  .settings-table thead th { padding:10px 14px; text-align:left; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text2); background:var(--surface2); border-bottom:2px solid var(--border); white-space:nowrap; }
+  .settings-table tbody tr { border-bottom:1px solid rgba(15,23,42,0.05); transition:background 0.1s; }
+  .settings-table tbody tr:hover { background:#f8faff; }
+  .settings-table tbody td { padding:9px 14px; vertical-align:middle; }
+  .settings-table .store-num { font-family:var(--font-mono); font-weight:700; color:var(--accent); font-size:0.8rem; }
+  .settings-table .store-name-s { color:var(--text2); font-size:0.78rem; }
+  .s-sel { background:var(--surface2); border:1.5px solid var(--border); border-radius:6px; padding:6px 8px; color:var(--text); font-family:var(--font); font-size:0.78rem; outline:none; cursor:pointer; min-width:120px; transition:border-color 0.15s; }
+  .s-sel:focus { border-color:var(--accent); background:#fff; }
+  .s-sel.changed { border-color:#f59e0b; background:#fffbeb; }
+  .btn-settings-save { padding:10px 24px; background:var(--accent); border:none; border-radius:9px; color:#fff; font-family:var(--font); font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.15s; box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent); }
+  .btn-settings-save:hover { filter:brightness(1.07); transform:translateY(-1px); }
+  .btn-settings-cancel { padding:10px 18px; background:transparent; border:1.5px solid var(--border); border-radius:9px; color:var(--text2); font-family:var(--font); font-weight:500; font-size:0.85rem; cursor:pointer; transition:all 0.12s; margin-right:8px; }
+  .btn-settings-cancel:hover { border-color:var(--border2); color:var(--text); }
+  .settings-badge-changed { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:#fffbeb; color:#b45309; border:1px solid #fde68a; border-radius:99px; font-size:0.68rem; font-weight:700; }
+  .settings-badge-custom { background:#eff6ff; color:var(--accent); border-color:#bfdbfe; }
+  .settings-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+  .settings-save-status { font-size:0.78rem; color:var(--text3); }
+  .settings-save-status.ok { color:#059669; }
+  .settings-save-status.err { color:#dc2626; }
+  .s-add-row { display:grid; grid-template-columns:100px 1fr 1fr auto; gap:8px; align-items:end; margin-top:14px; padding:14px; background:var(--surface2); border-radius:10px; border:1px solid var(--border); }
+  .s-add-row label { font-size:0.66rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px; display:block; }
+  .s-fi { background:#fff; border:1.5px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-family:var(--font); font-size:0.82rem; outline:none; width:100%; transition:border-color 0.15s; }
+  .s-fi:focus { border-color:var(--accent); }
+  .btn-add-zone { padding:9px 18px; background:linear-gradient(120deg,var(--green),var(--green-lt)); border:none; border-radius:7px; color:#fff; font-family:var(--font); font-weight:700; font-size:0.8rem; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+  .btn-add-zone:hover { filter:brightness(1.07); }
+  .settings-zone-filter { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+  .zone-filter-btn { padding:5px 14px; border-radius:99px; font-size:0.75rem; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:var(--surface2); color:var(--text2); transition:all 0.12s; }
+  .zone-filter-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
 </style>
 </head>
 <body>
@@ -955,6 +991,7 @@
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('items')">รายการสินค้า</button>
+    <button class="nav-tab" id="nav-tab-settings" onclick="showPage('settings')" style="display:none">⚙️ Settings</button>
   </div>
   <div class="nav-right">
     <div class="nav-user-badge" id="nav-user-badge">
@@ -998,6 +1035,10 @@
   <button class="m-tab" id="mtab-items" onclick="showPage('items')">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
     สินค้า
+  </button>
+  <button class="m-tab" id="mtab-settings" onclick="showPage('settings')" style="display:none">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="1.8"/></svg>
+    Settings
   </button>
 </div>
 
@@ -1467,7 +1508,7 @@
    STORE LOOKUP TABLE  (จาก DATA_REG.xlsm · 165 สาขา)
    key = เลข Store 3 หลัก  →  { regional, zone }
 ══════════════════════════════════════════ */
-const STORE_LOOKUP = {"001":{"regional":"Regional 2","zone":"Zone9"},"002":{"regional":"Regional 2","zone":"Zone9"},"003":{"regional":"Regional 2","zone":"Zone10"},"004":{"regional":"Regional 2","zone":"Zone6"},"005":{"regional":"Regional 3","zone":"Zone13"},"006":{"regional":"Regional 1","zone":"Zone1"},"007":{"regional":"Regional 3","zone":"Zone11"},"008":{"regional":"Regional 3","zone":"Zone12"},"009":{"regional":"Regional 4","zone":"Zone17"},"010":{"regional":"Regional 1","zone":"Zone3"},"011":{"regional":"Regional 1","zone":"Zone2"},"012":{"regional":"Regional 1","zone":"Zone4"},"013":{"regional":"Regional 4","zone":"Zone16"},"014":{"regional":"Regional 3","zone":"Zone11"},"015":{"regional":"Regional 3","zone":"Zone14"},"016":{"regional":"Regional 1","zone":"Zone5"},"017":{"regional":"Regional 2","zone":"Zone7"},"018":{"regional":"Regional 2","zone":"Zone8"},"019":{"regional":"Regional 2","zone":"Zone6"},"020":{"regional":"Regional 3","zone":"Zone11"},"021":{"regional":"Regional 2","zone":"Zone7"},"022":{"regional":"Regional 4","zone":"Zone17"},"023":{"regional":"Regional 1","zone":"Zone1"},"024":{"regional":"Regional 1","zone":"Zone3"},"025":{"regional":"Regional 1","zone":"Zone5"},"026":{"regional":"Regional 3","zone":"Zone14"},"027":{"regional":"Regional 4","zone":"Zone16"},"028":{"regional":"Regional 1","zone":"Zone4"},"029":{"regional":"Regional 4","zone":"Zone17"},"030":{"regional":"Regional 3","zone":"Zone12"},"031":{"regional":"Regional 4","zone":"Zone17"},"032":{"regional":"Regional 3","zone":"Zone11"},"033":{"regional":"Regional 3","zone":"Zone11"},"034":{"regional":"Regional 1","zone":"Zone1"},"035":{"regional":"Regional 4","zone":"Zone16"},"036":{"regional":"Regional 3","zone":"Zone15"},"037":{"regional":"Regional 1","zone":"Zone4"},"038":{"regional":"Regional 1","zone":"Zone5"},"039":{"regional":"Regional 3","zone":"Zone15"},"040":{"regional":"Regional 3","zone":"Zone13"},"041":{"regional":"Regional 1","zone":"Zone1"},"042":{"regional":"Regional 2","zone":"Zone9"},"043":{"regional":"Regional 3","zone":"Zone15"},"044":{"regional":"Regional 3","zone":"Zone14"},"045":{"regional":"Regional 1","zone":"Zone2"},"046":{"regional":"Regional 2","zone":"Zone6"},"047":{"regional":"Regional 1","zone":"Zone5"},"048":{"regional":"Regional 1","zone":"Zone3"},"049":{"regional":"Regional 2","zone":"Zone6"},"050":{"regional":"Regional 1","zone":"Zone1"},"051":{"regional":"Regional 3","zone":"Zone12"},"052":{"regional":"Regional 1","zone":"Zone2"},"053":{"regional":"Regional 3","zone":"Zone15"},"054":{"regional":"Regional 3","zone":"Zone12"},"055":{"regional":"Regional 1","zone":"Zone3"},"056":{"regional":"Regional 1","zone":"Zone5"},"057":{"regional":"Regional 2","zone":"Zone8"},"058":{"regional":"Regional 1","zone":"Zone3"},"059":{"regional":"Regional 4","zone":"Zone17"},"060":{"regional":"Regional 3","zone":"Zone14"},"061":{"regional":"Regional 1","zone":"Zone4"},"062":{"regional":"Regional 4","zone":"Zone16"},"063":{"regional":"Regional 1","zone":"Zone3"},"064":{"regional":"Regional 4","zone":"Zone17"},"065":{"regional":"Regional 1","zone":"Zone3"},"066":{"regional":"Regional 3","zone":"Zone14"},"067":{"regional":"Regional 1","zone":"Zone1"},"068":{"regional":"Regional 2","zone":"Zone6"},"069":{"regional":"Regional 4","zone":"Zone16"},"070":{"regional":"Regional 1","zone":"Zone2"},"071":{"regional":"Regional 4","zone":"Zone16"},"072":{"regional":"Regional 2","zone":"Zone6"},"073":{"regional":"Regional 1","zone":"Zone2"},"074":{"regional":"Regional 1","zone":"Zone5"},"075":{"regional":"Regional 4","zone":"Zone16"},"076":{"regional":"Regional 3","zone":"Zone15"},"077":{"regional":"Regional 4","zone":"Zone17"},"078":{"regional":"Regional 2","zone":"Zone8"},"079":{"regional":"Regional 1","zone":"Zone4"},"080":{"regional":"Regional 1","zone":"Zone4"},"081":{"regional":"Regional 1","zone":"Zone1"},"082":{"regional":"Regional 3","zone":"Zone12"},"083":{"regional":"Regional 2","zone":"Zone7"},"084":{"regional":"Regional 3","zone":"Zone14"},"085":{"regional":"Regional 4","zone":"Zone17"},"086":{"regional":"Regional 2","zone":"Zone10"},"087":{"regional":"Regional 1","zone":"Zone1"},"089":{"regional":"Regional 1","zone":"Zone2"},"096":{"regional":"Regional 2","zone":"Zone10"},"100":{"regional":"Regional 1","zone":"Zone2"},"101":{"regional":"Regional 3","zone":"Zone14"},"102":{"regional":"Regional 3","zone":"Zone11"},"103":{"regional":"Regional 1","zone":"Zone2"},"104":{"regional":"Regional 4","zone":"Zone16"},"105":{"regional":"Regional 4","zone":"Zone16"},"106":{"regional":"Regional 3","zone":"Zone11"},"107":{"regional":"Regional 1","zone":"Zone3"},"108":{"regional":"Regional 3","zone":"Zone13"},"109":{"regional":"Regional 3","zone":"Zone13"},"110":{"regional":"Regional 3","zone":"Zone15"},"111":{"regional":"Regional 2","zone":"Zone6"},"112":{"regional":"Regional 2","zone":"Zone8"},"113":{"regional":"Regional 2","zone":"Zone9"},"114":{"regional":"Regional 1","zone":"Zone5"},"115":{"regional":"Regional 2","zone":"Zone7"},"116":{"regional":"Regional 1","zone":"Zone4"},"117":{"regional":"Regional 2","zone":"Zone10"},"118":{"regional":"Regional 2","zone":"Zone9"},"119":{"regional":"Regional 1","zone":"Zone5"},"120":{"regional":"Regional 2","zone":"Zone7"},"121":{"regional":"Regional 2","zone":"Zone9"},"122":{"regional":"Regional 2","zone":"Zone8"},"123":{"regional":"Regional 2","zone":"Zone8"},"124":{"regional":"Regional 2","zone":"Zone9"},"125":{"regional":"Regional 3","zone":"Zone15"},"126":{"regional":"Regional 2","zone":"Zone10"},"127":{"regional":"Regional 2","zone":"Zone8"},"128":{"regional":"Regional 3","zone":"Zone12"},"129":{"regional":"Regional 3","zone":"Zone13"},"130":{"regional":"Regional 3","zone":"Zone12"},"131":{"regional":"Regional 3","zone":"Zone14"},"132":{"regional":"Regional 3","zone":"Zone14"},"133":{"regional":"Regional 2","zone":"Zone10"},"134":{"regional":"Regional 3","zone":"Zone13"},"135":{"regional":"Regional 2","zone":"Zone8"},"136":{"regional":"Regional 1","zone":"Zone4"},"137":{"regional":"Regional 2","zone":"Zone10"},"138":{"regional":"Regional 2","zone":"Zone10"},"139":{"regional":"Regional 2","zone":"Zone10"},"140":{"regional":"Regional 2","zone":"Zone7"},"141":{"regional":"Regional 3","zone":"Zone12"},"142":{"regional":"Regional 2","zone":"Zone8"},"143":{"regional":"Regional 2","zone":"Zone9"},"144":{"regional":"Regional 3","zone":"Zone12"},"145":{"regional":"Regional 2","zone":"Zone7"},"146":{"regional":"Regional 1","zone":"Zone2"},"147":{"regional":"Regional 2","zone":"Zone9"},"148":{"regional":"Regional 3","zone":"Zone13"},"149":{"regional":"Regional 2","zone":"Zone6"},"150":{"regional":"Regional 2","zone":"Zone7"},"151":{"regional":"Regional 2","zone":"Zone9"},"152":{"regional":"Regional 2","zone":"Zone6"},"153":{"regional":"Regional 4","zone":"Zone17"},"154":{"regional":"Regional 3","zone":"Zone12"},"155":{"regional":"Regional 2","zone":"Zone7"},"156":{"regional":"Regional 2","zone":"Zone8"},"157":{"regional":"Regional 3","zone":"Zone11"},"158":{"regional":"Regional 1","zone":"Zone5"},"159":{"regional":"Regional 1","zone":"Zone3"},"160":{"regional":"Regional 2","zone":"Zone6"},"161":{"regional":"Regional 1","zone":"Zone4"},"162":{"regional":"Regional 3","zone":"Zone13"},"163":{"regional":"Regional 4","zone":"Zone17"},"164":{"regional":"Regional 1","zone":"Zone5"},"165":{"regional":"Regional 2","zone":"Zone10"},"166":{"regional":"Regional 4","zone":"Zone16"},"167":{"regional":"Regional 1","zone":"Zone1"},"168":{"regional":"Regional 3","zone":"Zone13"},"169":{"regional":"Regional 3","zone":"Zone15"},"170":{"regional":"Regional 3","zone":"Zone11"},"171":{"regional":"Regional 3","zone":"Zone11"},"172":{"regional":"Regional 1","zone":"Zone4"},"175":{"regional":"Regional 2","zone":"Zone8"},"301":{"regional":"Regional 2","zone":"Zone7"},"303":{"regional":"Regional 1","zone":"Zone1"}};
+const STORE_LOOKUP = {"001": {"regional": "Regional 2", "zone": "Zone9"}, "002": {"regional": "Regional 2", "zone": "Zone9"}, "003": {"regional": "Regional 2", "zone": "Zone10"}, "004": {"regional": "Regional 2", "zone": "Zone6"}, "005": {"regional": "Regional 3", "zone": "Zone13"}, "006": {"regional": "Regional 1", "zone": "Zone1"}, "007": {"regional": "Regional 3", "zone": "Zone11"}, "008": {"regional": "Regional 3", "zone": "Zone12"}, "009": {"regional": "Regional 4", "zone": "Zone17"}, "010": {"regional": "Regional 1", "zone": "Zone3"}, "011": {"regional": "Regional 1", "zone": "Zone2"}, "012": {"regional": "Regional 1", "zone": "Zone4"}, "013": {"regional": "Regional 4", "zone": "Zone16"}, "014": {"regional": "Regional 3", "zone": "Zone11"}, "015": {"regional": "Regional 3", "zone": "Zone14"}, "016": {"regional": "Regional 1", "zone": "Zone5"}, "017": {"regional": "Regional 2", "zone": "Zone7"}, "018": {"regional": "Regional 2", "zone": "Zone8"}, "019": {"regional": "Regional 2", "zone": "Zone6"}, "020": {"regional": "Regional 3", "zone": "Zone11"}, "021": {"regional": "Regional 2", "zone": "Zone7"}, "022": {"regional": "Regional 4", "zone": "Zone17"}, "023": {"regional": "Regional 1", "zone": "Zone1"}, "024": {"regional": "Regional 1", "zone": "Zone3"}, "025": {"regional": "Regional 1", "zone": "Zone5"}, "026": {"regional": "Regional 3", "zone": "Zone14"}, "027": {"regional": "Regional 4", "zone": "Zone16"}, "028": {"regional": "Regional 1", "zone": "Zone4"}, "029": {"regional": "Regional 4", "zone": "Zone17"}, "030": {"regional": "Regional 3", "zone": "Zone12"}, "031": {"regional": "Regional 4", "zone": "Zone17"}, "032": {"regional": "Regional 3", "zone": "Zone11"}, "033": {"regional": "Regional 3", "zone": "Zone11"}, "034": {"regional": "Regional 1", "zone": "Zone1"}, "035": {"regional": "Regional 4", "zone": "Zone16"}, "036": {"regional": "Regional 4", "zone": "Zone15"}, "037": {"regional": "Regional 1", "zone": "Zone4"}, "038": {"regional": "Regional 1", "zone": "Zone5"}, "039": {"regional": "Regional 4", "zone": "Zone15"}, "040": {"regional": "Regional 3", "zone": "Zone13"}, "041": {"regional": "Regional 1", "zone": "Zone1"}, "042": {"regional": "Regional 2", "zone": "Zone9"}, "043": {"regional": "Regional 4", "zone": "Zone15"}, "044": {"regional": "Regional 3", "zone": "Zone14"}, "045": {"regional": "Regional 1", "zone": "Zone2"}, "046": {"regional": "Regional 2", "zone": "Zone6"}, "047": {"regional": "Regional 1", "zone": "Zone5"}, "048": {"regional": "Regional 1", "zone": "Zone3"}, "049": {"regional": "Regional 2", "zone": "Zone6"}, "050": {"regional": "Regional 1", "zone": "Zone1"}, "051": {"regional": "Regional 3", "zone": "Zone12"}, "052": {"regional": "Regional 1", "zone": "Zone2"}, "053": {"regional": "Regional 4", "zone": "Zone15"}, "054": {"regional": "Regional 3", "zone": "Zone12"}, "055": {"regional": "Regional 1", "zone": "Zone3"}, "056": {"regional": "Regional 1", "zone": "Zone5"}, "057": {"regional": "Regional 2", "zone": "Zone8"}, "058": {"regional": "Regional 1", "zone": "Zone3"}, "059": {"regional": "Regional 4", "zone": "Zone17"}, "060": {"regional": "Regional 3", "zone": "Zone14"}, "061": {"regional": "Regional 1", "zone": "Zone4"}, "062": {"regional": "Regional 4", "zone": "Zone16"}, "063": {"regional": "Regional 1", "zone": "Zone3"}, "064": {"regional": "Regional 4", "zone": "Zone17"}, "065": {"regional": "Regional 1", "zone": "Zone3"}, "066": {"regional": "Regional 3", "zone": "Zone14"}, "067": {"regional": "Regional 1", "zone": "Zone1"}, "068": {"regional": "Regional 2", "zone": "Zone6"}, "069": {"regional": "Regional 4", "zone": "Zone16"}, "070": {"regional": "Regional 1", "zone": "Zone2"}, "071": {"regional": "Regional 4", "zone": "Zone16"}, "072": {"regional": "Regional 2", "zone": "Zone6"}, "073": {"regional": "Regional 1", "zone": "Zone2"}, "074": {"regional": "Regional 1", "zone": "Zone5"}, "075": {"regional": "Regional 4", "zone": "Zone16"}, "076": {"regional": "Regional 4", "zone": "Zone15"}, "077": {"regional": "Regional 4", "zone": "Zone17"}, "078": {"regional": "Regional 2", "zone": "Zone8"}, "079": {"regional": "Regional 1", "zone": "Zone4"}, "080": {"regional": "Regional 1", "zone": "Zone4"}, "081": {"regional": "Regional 1", "zone": "Zone1"}, "082": {"regional": "Regional 3", "zone": "Zone12"}, "083": {"regional": "Regional 2", "zone": "Zone7"}, "084": {"regional": "Regional 3", "zone": "Zone14"}, "085": {"regional": "Regional 4", "zone": "Zone17"}, "086": {"regional": "Regional 2", "zone": "Zone10"}, "087": {"regional": "Regional 1", "zone": "Zone1"}, "089": {"regional": "Regional 1", "zone": "Zone2"}, "096": {"regional": "Regional 2", "zone": "Zone10"}, "100": {"regional": "Regional 1", "zone": "Zone2"}, "101": {"regional": "Regional 3", "zone": "Zone14"}, "102": {"regional": "Regional 3", "zone": "Zone11"}, "103": {"regional": "Regional 1", "zone": "Zone2"}, "104": {"regional": "Regional 4", "zone": "Zone16"}, "105": {"regional": "Regional 4", "zone": "Zone16"}, "106": {"regional": "Regional 3", "zone": "Zone11"}, "107": {"regional": "Regional 1", "zone": "Zone3"}, "108": {"regional": "Regional 3", "zone": "Zone13"}, "109": {"regional": "Regional 3", "zone": "Zone13"}, "110": {"regional": "Regional 4", "zone": "Zone15"}, "111": {"regional": "Regional 2", "zone": "Zone6"}, "112": {"regional": "Regional 2", "zone": "Zone8"}, "113": {"regional": "Regional 2", "zone": "Zone9"}, "114": {"regional": "Regional 1", "zone": "Zone5"}, "115": {"regional": "Regional 2", "zone": "Zone7"}, "116": {"regional": "Regional 1", "zone": "Zone4"}, "117": {"regional": "Regional 2", "zone": "Zone10"}, "118": {"regional": "Regional 2", "zone": "Zone9"}, "119": {"regional": "Regional 1", "zone": "Zone5"}, "120": {"regional": "Regional 2", "zone": "Zone7"}, "121": {"regional": "Regional 2", "zone": "Zone9"}, "122": {"regional": "Regional 2", "zone": "Zone8"}, "123": {"regional": "Regional 2", "zone": "Zone8"}, "124": {"regional": "Regional 2", "zone": "Zone9"}, "125": {"regional": "Regional 4", "zone": "Zone15"}, "126": {"regional": "Regional 2", "zone": "Zone10"}, "127": {"regional": "Regional 2", "zone": "Zone8"}, "128": {"regional": "Regional 3", "zone": "Zone12"}, "129": {"regional": "Regional 3", "zone": "Zone13"}, "130": {"regional": "Regional 3", "zone": "Zone12"}, "131": {"regional": "Regional 3", "zone": "Zone14"}, "132": {"regional": "Regional 3", "zone": "Zone14"}, "133": {"regional": "Regional 2", "zone": "Zone10"}, "134": {"regional": "Regional 3", "zone": "Zone13"}, "135": {"regional": "Regional 2", "zone": "Zone8"}, "136": {"regional": "Regional 1", "zone": "Zone4"}, "137": {"regional": "Regional 2", "zone": "Zone10"}, "138": {"regional": "Regional 2", "zone": "Zone10"}, "139": {"regional": "Regional 2", "zone": "Zone10"}, "140": {"regional": "Regional 2", "zone": "Zone7"}, "141": {"regional": "Regional 3", "zone": "Zone12"}, "142": {"regional": "Regional 2", "zone": "Zone8"}, "143": {"regional": "Regional 2", "zone": "Zone9"}, "144": {"regional": "Regional 3", "zone": "Zone12"}, "145": {"regional": "Regional 2", "zone": "Zone7"}, "146": {"regional": "Regional 1", "zone": "Zone2"}, "147": {"regional": "Regional 2", "zone": "Zone9"}, "148": {"regional": "Regional 3", "zone": "Zone13"}, "149": {"regional": "Regional 2", "zone": "Zone6"}, "150": {"regional": "Regional 2", "zone": "Zone7"}, "151": {"regional": "Regional 2", "zone": "Zone9"}, "152": {"regional": "Regional 2", "zone": "Zone6"}, "153": {"regional": "Regional 4", "zone": "Zone17"}, "154": {"regional": "Regional 3", "zone": "Zone12"}, "155": {"regional": "Regional 2", "zone": "Zone7"}, "156": {"regional": "Regional 2", "zone": "Zone8"}, "157": {"regional": "Regional 3", "zone": "Zone11"}, "158": {"regional": "Regional 1", "zone": "Zone5"}, "159": {"regional": "Regional 1", "zone": "Zone3"}, "160": {"regional": "Regional 2", "zone": "Zone6"}, "161": {"regional": "Regional 1", "zone": "Zone4"}, "162": {"regional": "Regional 3", "zone": "Zone13"}, "163": {"regional": "Regional 4", "zone": "Zone17"}, "164": {"regional": "Regional 1", "zone": "Zone5"}, "165": {"regional": "Regional 2", "zone": "Zone10"}, "166": {"regional": "Regional 4", "zone": "Zone16"}, "167": {"regional": "Regional 1", "zone": "Zone1"}, "168": {"regional": "Regional 3", "zone": "Zone13"}, "169": {"regional": "Regional 4", "zone": "Zone15"}, "170": {"regional": "Regional 3", "zone": "Zone11"}, "171": {"regional": "Regional 3", "zone": "Zone11"}, "172": {"regional": "Regional 1", "zone": "Zone4"}, "175": {"regional": "Regional 2", "zone": "Zone8"}, "301": {"regional": "Regional 2", "zone": "Zone7"}, "303": {"regional": "Regional 1", "zone": "Zone1"}};
 
 /* ══════════════════════════════════════════
    STORE NAME LOOKUP  (จาก DATA.xlsm sheet "เลขสาขา" · 165 สาขา)
@@ -2830,6 +2871,463 @@ function renderDashboard() {
 }
 window.renderDashboard = renderDashboard;
 
+/* ══════════════════════════════════════════════════════════════════
+   SETTINGS — Zone / Regional Management  (Admin Only)
+   ═══════════════════════════════════════════════════════════════════ */
+
+const ZONE_CONFIG_PATH = 'soa_zone_config';
+let ZONE_OVERRIDES = {};
+let _settingsChanges = {};
+
+function resolveStore(num) {
+  const key = String(num).padStart(3,'0');
+  return ZONE_OVERRIDES[key] || STORE_LOOKUP[key] || null;
+}
+window.resolveStore = resolveStore;
+
+function getCustomRegionals() {
+  try { return JSON.parse(localStorage.getItem('soa_custom_regionals') || '[]'); } catch { return []; }
+}
+function getCustomZones() {
+  try { return JSON.parse(localStorage.getItem('soa_custom_zones') || '[]'); } catch { return []; }
+}
+function saveCustomRegionals(arr) {
+  try { localStorage.setItem('soa_custom_regionals', JSON.stringify(arr)); } catch {}
+}
+function saveCustomZones(arr) {
+  try { localStorage.setItem('soa_custom_zones', JSON.stringify(arr)); } catch {}
+}
+
+function getAllRegionals() {
+  const s = new Set();
+  Object.keys(STORE_LOOKUP).forEach(k => {
+    const r = resolveStore(k);
+    if (r) s.add(r.regional);
+  });
+  Object.values(ZONE_OVERRIDES).forEach(v => { if(v && v.regional) s.add(v.regional); });
+  getCustomRegionals().forEach(r => s.add(r));
+  return [...s].sort();
+}
+
+function getAllZones() {
+  const s = new Set();
+  Object.keys(STORE_LOOKUP).forEach(k => {
+    const r = resolveStore(k);
+    if (r) s.add(r.zone);
+  });
+  Object.values(ZONE_OVERRIDES).forEach(v => { if(v && v.zone) s.add(v.zone); });
+  getCustomZones().forEach(z => s.add(z));
+  return [...s].sort((a,b) => {
+    const na=parseInt(a.replace(/\D/g,'')), nb=parseInt(b.replace(/\D/g,''));
+    if(!isNaN(na)&&!isNaN(nb)) return na-nb;
+    return a.localeCompare(b,'th');
+  });
+}
+
+async function loadZoneConfig() {
+  if (!db || !onValue) return;
+  try {
+    const snap = await new Promise((res,rej) => {
+      const r2 = ref(db, ZONE_CONFIG_PATH);
+      onValue(r2, res, rej, { onlyOnce: true });
+    });
+    const data = snap.val();
+    if (data && typeof data === 'object') ZONE_OVERRIDES = data;
+  } catch(e) { console.warn('loadZoneConfig:', e); }
+}
+
+async function saveZoneConfig(overrides) {
+  if (!db) { toast('⚠ ไม่ได้เชื่อมต่อ Firebase'); return false; }
+  try {
+    await set(ref(db, ZONE_CONFIG_PATH), overrides);
+    return true;
+  } catch(e) { console.error('saveZoneConfig:', e); return false; }
+}
+
+function listenZoneConfig() {
+  if (!db || !onValue) return;
+  onValue(ref(db, ZONE_CONFIG_PATH), (snap) => {
+    const data = snap.val();
+    ZONE_OVERRIDES = (data && typeof data === 'object') ? data : {};
+    if (document.getElementById('page-settings')?.classList.contains('active')) {
+      renderSettingsTable();
+      renderSettingsSummary();
+    }
+  });
+}
+
+/* ── Patch onStoreNumInput to use resolveStore ── */
+window.onStoreNumInput = function(val) {
+  const raw   = val.replace(/\D/g, '').slice(0, 3);
+  const badge = document.getElementById('store-lookup-badge');
+  const miss  = document.getElementById('store-lookup-miss');
+  const fReg  = document.getElementById('f-regional');
+  const fZone = document.getElementById('f-zone');
+  const input = document.getElementById('f-store-num');
+  if (input.value !== raw) input.value = raw;
+  badge.style.display = 'none';
+  miss.style.display  = 'none';
+  if (raw.length < 3) { fReg.value=''; fZone.value=''; fReg.style.borderColor=''; fZone.style.borderColor=''; return; }
+  const key  = raw.padStart(3, '0');
+  const data = resolveStore(key);
+  if (data) {
+    fReg.value = data.regional; fZone.value = data.zone;
+    fReg.style.borderColor = '#059669'; fZone.style.borderColor = '#059669';
+    badge.style.display = 'block';
+    setTimeout(() => document.getElementById('f-store')?.focus(), 80);
+  } else {
+    fReg.value=''; fZone.value='';
+    fReg.style.borderColor='#dc2626'; fZone.style.borderColor='#dc2626';
+    miss.style.display='block';
+  }
+};
+
+/* ── applyRoleUI patch ── */
+const _origApplyRoleUI_s = window.applyRoleUI;
+window.applyRoleUI = function() {
+  _origApplyRoleUI_s();
+  const isAdmin = currentRole === 'admin';
+  const t = document.getElementById('nav-tab-settings');
+  const m = document.getElementById('mtab-settings');
+  if(t) t.style.display = isAdmin ? '' : 'none';
+  if(m) m.style.display = isAdmin ? '' : 'none';
+};
+
+/* ── showPage patch ── */
+const _origShowPage_s = window.showPage;
+window.showPage = function(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if(pg) pg.classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  tabs.forEach((t,i) => t.classList.toggle('active',
+    (i===0&&page==='dashboard')||(i===1&&page==='items')||(i===2&&page==='settings')
+  ));
+  ['dashboard','items','settings'].forEach(p => {
+    const e=document.getElementById('mtab-'+p); if(e) e.classList.toggle('active',p===page);
+  });
+  if (page==='dashboard') renderDashboard();
+  if (page==='items')     renderTable();
+  if (page==='settings')  renderSettingsPage();
+};
+
+/* ── Settings page render ── */
+let _settingsZoneFilter = 'all';
+
+function filterSettingsTable(zone) {
+  _settingsZoneFilter = zone;
+  document.querySelectorAll('.zone-filter-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-zone') === zone);
+  });
+  renderSettingsTable();
+}
+window.filterSettingsTable = filterSettingsTable;
+
+function renderSettingsPage() {
+  const zones = getAllZones();
+  const regs  = getAllRegionals();
+  const btnCont = document.getElementById('zone-filter-btns');
+  if (btnCont) {
+    btnCont.innerHTML =
+      `<button class="zone-filter-btn${_settingsZoneFilter==='all'?' active':''}" data-zone="all" onclick="filterSettingsTable('all')">ทั้งหมด</button>` +
+      zones.map(z => `<button class="zone-filter-btn${_settingsZoneFilter===z?' active':''}" data-zone="${z}" onclick="filterSettingsTable('${z}')">${z}</button>`).join('');
+  }
+  const regSel = document.getElementById('settings-filter-reg');
+  if (regSel) {
+    const cur = regSel.value;
+    regSel.innerHTML = '<option value="">All Regional</option>' +
+      regs.map(r => `<option value="${r}"${r===cur?' selected':''}>${r}</option>`).join('');
+  }
+  renderSettingsTable();
+  renderSettingsSummary();
+  renderRegionalPreview();
+  renderZonePreview();
+}
+window.renderSettingsPage = renderSettingsPage;
+
+function renderSettingsTable() {
+  const tbody = document.getElementById('settings-table-body');
+  if (!tbody) return;
+  const q    = (document.getElementById('settings-search')?.value||'').toLowerCase();
+  const fReg = document.getElementById('settings-filter-reg')?.value||'';
+  const zones = getAllZones();
+  const regs  = getAllRegionals();
+  const stores = Object.keys(STORE_LOOKUP).sort((a,b)=>parseInt(a,10)-parseInt(b,10));
+  let shown = 0;
+  const rows = stores.map(sn => {
+    const override = ZONE_OVERRIDES[sn]||null;
+    const pending  = _settingsChanges[sn]||null;
+    const current  = pending || override || STORE_LOOKUP[sn];
+    const sname    = STORE_NAME_LOOKUP[sn]||('Store '+sn);
+    if (_settingsZoneFilter!=='all' && current.zone!==_settingsZoneFilter) return '';
+    if (fReg && current.regional!==fReg) return '';
+    if (q && !sn.includes(q) && !sname.toLowerCase().includes(q)) return '';
+    shown++;
+    const isChanged  = !!pending;
+    const isOverride = !!override && !pending;
+    let badge = '';
+    if (isChanged)       badge = '<span class="settings-badge-changed">✏️ แก้ไข</span>';
+    else if (isOverride) badge = '<span class="settings-badge-changed settings-badge-custom">★ Custom</span>';
+    const rOpts = regs.map(r=>`<option value="${r}"${r===current.regional?' selected':''}>${r}</option>`).join('');
+    const zOpts = zones.map(z=>`<option value="${z}"${z===current.zone?' selected':''}>${z}</option>`).join('');
+    return `<tr>
+      <td class="store-num">${sn}</td>
+      <td class="store-name-s">${sname}</td>
+      <td><select class="s-sel${isChanged?' changed':''}" id="sr-${sn}" onchange="onSettingsChange('${sn}')">${rOpts}</select></td>
+      <td><select class="s-sel${isChanged?' changed':''}" id="sz-${sn}" onchange="onSettingsChange('${sn}')">${zOpts}</select></td>
+      <td style="text-align:center">${badge}</td>
+    </tr>`;
+  }).filter(Boolean).join('');
+  tbody.innerHTML = rows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">ไม่พบสาขา</td></tr>';
+  const cb = document.getElementById('settings-count-badge');
+  if(cb) cb.textContent = `แสดง ${shown} / ${stores.length} สาขา`;
+  updateSettingsChangedBadge();
+}
+window.renderSettingsTable = renderSettingsTable;
+
+function onSettingsChange(sn) {
+  const rEl = document.getElementById('sr-'+sn);
+  const zEl = document.getElementById('sz-'+sn);
+  if(!rEl||!zEl) return;
+  const saved = ZONE_OVERRIDES[sn] || STORE_LOOKUP[sn] || {};
+  const nR = rEl.value, nZ = zEl.value;
+  if(nR===saved.regional && nZ===saved.zone) {
+    delete _settingsChanges[sn];
+    rEl.classList.remove('changed'); zEl.classList.remove('changed');
+  } else {
+    _settingsChanges[sn] = {regional:nR, zone:nZ};
+    rEl.classList.add('changed'); zEl.classList.add('changed');
+  }
+  updateSettingsChangedBadge();
+}
+window.onSettingsChange = onSettingsChange;
+
+function updateSettingsChangedBadge() {
+  const b = document.getElementById('settings-changed-count');
+  const n = Object.keys(_settingsChanges).length;
+  if(!b) return;
+  if(n>0) { b.style.display='inline-flex'; b.textContent=`● ${n} รายการรอบันทึก`; }
+  else b.style.display='none';
+}
+
+async function saveSettingsChanges() {
+  if(Object.keys(_settingsChanges).length===0){ toast('ℹ️ ไม่มีการเปลี่ยนแปลง'); return; }
+  const status = document.getElementById('settings-save-status');
+  if(status){ status.className='settings-save-status'; status.textContent='⏳ กำลังบันทึก...'; }
+  const newOv = {...ZONE_OVERRIDES, ..._settingsChanges};
+  Object.keys(newOv).forEach(k => {
+    const base = STORE_LOOKUP[k];
+    if(base && newOv[k].regional===base.regional && newOv[k].zone===base.zone) delete newOv[k];
+  });
+  const ok = await saveZoneConfig(Object.keys(newOv).length>0 ? newOv : null);
+  if(ok){
+    ZONE_OVERRIDES = newOv;
+    _settingsChanges = {};
+    if(status){ status.className='settings-save-status ok'; status.textContent='✔ บันทึกสำเร็จ! การเปลี่ยนแปลงมีผลแล้ว'; }
+    toast('✔ บันทึก Zone/Regional เรียบร้อย');
+    renderSettingsTable(); renderSettingsSummary();
+    syncFilters(); renderDashboard(); renderTable();
+    setTimeout(()=>{ if(status) status.textContent=''; }, 4000);
+  } else {
+    if(status){ status.className='settings-save-status err'; status.textContent='❌ บันทึกไม่สำเร็จ — ลองอีกครั้ง'; }
+    toast('❌ บันทึกไม่สำเร็จ');
+  }
+}
+window.saveSettingsChanges = saveSettingsChanges;
+
+function cancelSettingsChanges() {
+  _settingsChanges = {};
+  renderSettingsTable();
+  toast('↩ ยกเลิกการเปลี่ยนแปลงแล้ว');
+}
+window.cancelSettingsChanges = cancelSettingsChanges;
+
+function addNewRegional() {
+  const inp = document.getElementById('new-regional-name');
+  const val = (inp?.value||'').trim();
+  if(!val){ toast('⚠ กรุณากรอกชื่อ Regional'); return; }
+  if(getAllRegionals().includes(val)){ toast('⚠ Regional นี้มีอยู่แล้ว'); return; }
+  const arr = getCustomRegionals(); if(!arr.includes(val)){ arr.push(val); saveCustomRegionals(arr); }
+  if(inp) inp.value='';
+  toast(`✔ เพิ่ม ${val} แล้ว`);
+  renderSettingsPage();
+}
+window.addNewRegional = addNewRegional;
+
+function addNewZone() {
+  const inp = document.getElementById('new-zone-name');
+  const val = (inp?.value||'').trim();
+  if(!val){ toast('⚠ กรุณากรอกชื่อ Zone'); return; }
+  if(getAllZones().includes(val)){ toast('⚠ Zone นี้มีอยู่แล้ว'); return; }
+  const arr = getCustomZones(); if(!arr.includes(val)){ arr.push(val); saveCustomZones(arr); }
+  if(inp) inp.value='';
+  toast(`✔ เพิ่ม ${val} แล้ว`);
+  renderSettingsPage();
+}
+window.addNewZone = addNewZone;
+
+function renderRegionalPreview() {
+  const el = document.getElementById('regional-list-preview'); if(!el) return;
+  el.innerHTML = '<strong>Regional ทั้งหมด:</strong> ' + getAllRegionals().map(r =>
+    `<span style="display:inline-block;padding:1px 8px;background:var(--surface3);border-radius:99px;margin:2px;font-size:0.72rem">${r}</span>`
+  ).join('');
+}
+
+function renderZonePreview() {
+  const el = document.getElementById('zone-list-preview'); if(!el) return;
+  el.innerHTML = '<strong>Zone ทั้งหมด:</strong> ' + getAllZones().map(z =>
+    `<span style="display:inline-block;padding:1px 8px;background:var(--surface3);border-radius:99px;margin:2px;font-size:0.72rem">${z}</span>`
+  ).join('');
+}
+
+function renderSettingsSummary() {
+  const el = document.getElementById('settings-summary-grid'); if(!el) return;
+  const byReg = {};
+  Object.keys(STORE_LOOKUP).forEach(sn => {
+    const r = resolveStore(sn); if(!r) return;
+    const reg=r.regional, zone=r.zone;
+    if(!byReg[reg]) byReg[reg]={};
+    if(!byReg[reg][zone]) byReg[reg][zone]=[];
+    byReg[reg][zone].push(sn);
+  });
+  el.innerHTML = Object.keys(byReg).sort().map(reg => {
+    const zones = Object.keys(byReg[reg]).sort((a,b)=>{
+      const na=parseInt(a.replace(/\D/g,'')), nb=parseInt(b.replace(/\D/g,''));
+      if(!isNaN(na)&&!isNaN(nb)) return na-nb; return a.localeCompare(b);
+    });
+    const total = Object.values(byReg[reg]).flat().length;
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="font-weight:700;font-size:0.85rem;color:#6d28d9;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span>🌏 ${reg}</span><span style="font-size:0.7rem;color:var(--text3);font-weight:400">${total} สาขา · ${zones.length} Zone</span>
+      </div>
+      ${zones.map(z=>{const ss=byReg[reg][z]; return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0">
+        <span style="font-size:0.7rem;color:var(--accent);font-weight:600;min-width:65px">${z}</span>
+        <span style="font-size:0.68rem;color:var(--text3)">${ss.length} สาขา</span>
+        <span style="font-size:0.65rem;color:var(--text3);font-family:var(--font-mono)">[${ss.slice(0,6).join(', ')}${ss.length>6?' …':''}]</span>
+      </div>`; }).join('')}
+    </div>`;
+  }).join('');
+}
+window.renderSettingsSummary = renderSettingsSummary;
+
+/* ── Init: load zone config after Firebase connects ── */
+document.addEventListener('DOMContentLoaded', () => {
+  let _zcInt = setInterval(() => {
+    if (db) {
+      clearInterval(_zcInt);
+      loadZoneConfig().then(() => {
+        listenZoneConfig();
+        if (currentRole) { syncFilters(); renderDashboard(); renderTable(); }
+      });
+    }
+  }, 300);
+  setTimeout(() => clearInterval(_zcInt), 20000);
+});
+
+
 </script>
+
+<!-- ═══ SETTINGS PAGE ═══ -->
+<div id="page-settings" class="page">
+  <div class="settings-page">
+    <div class="page-header">
+      <div>
+        <h1>⚙️ Settings — Zone &amp; Regional Management</h1>
+        <p>จัดการการกำหนด Regional และ Zone ให้แต่ละสาขา (Admin Only)</p>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="settings-info-box">
+      ℹ️ <strong>วิธีใช้:</strong> เปลี่ยน Regional หรือ Zone ของสาขาใดก็ได้จากตารางด้านล่าง แล้วกด <strong>บันทึกการเปลี่ยนแปลง</strong>
+      — ระบบจะ sync ไปยัง Firebase ทันที และมีผลกับการ <em>กรอกข้อมูลใหม่</em> ในทุก session
+      <br>⚠️ ข้อมูลที่บันทึกไปแล้วก่อนหน้านี้จะยังคงมี Regional/Zone เดิม — ต้องแก้ไขผ่านปุ่ม Edit ในหน้ารายการสินค้า
+    </div>
+
+    <!-- Zone filter buttons -->
+    <div class="settings-section">
+      <div class="settings-section-title">🗺️ ค้นหาและกรองสาขา</div>
+      <div class="settings-zone-filter" id="zone-filter-btns">
+        <button class="zone-filter-btn active" onclick="filterSettingsTable('all')">ทั้งหมด</button>
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="settings-search" class="s-fi" style="max-width:260px" placeholder="ค้นหา Store No. หรือชื่อสาขา..." oninput="renderSettingsTable()">
+        <select id="settings-filter-reg" class="s-sel" onchange="renderSettingsTable()">
+          <option value="">All Regional</option>
+        </select>
+        <span id="settings-count-badge" style="font-size:0.75rem;color:var(--text3);font-family:var(--font-mono)"></span>
+      </div>
+    </div>
+
+    <!-- Store mapping table -->
+    <div class="settings-section">
+      <div class="settings-section-title">
+        🏬 รายการสาขาและ Zone/Regional ปัจจุบัน
+        <span id="settings-changed-count" style="display:none" class="settings-badge-changed">● มีการเปลี่ยนแปลง</span>
+      </div>
+      <div style="overflow:auto;border-radius:10px;border:1px solid var(--border)">
+        <table class="settings-table">
+          <thead>
+            <tr>
+              <th style="width:70px">Store No.</th>
+              <th>ชื่อสาขา</th>
+              <th style="width:160px">Regional</th>
+              <th style="width:160px">Zone</th>
+              <th style="width:80px">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody id="settings-table-body">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="settings-actions">
+        <button class="btn-settings-cancel" onclick="cancelSettingsChanges()">↩ ยกเลิกการเปลี่ยนแปลง</button>
+        <button class="btn-settings-save" onclick="saveSettingsChanges()">💾 บันทึกการเปลี่ยนแปลง</button>
+        <span class="settings-save-status" id="settings-save-status"></span>
+      </div>
+    </div>
+
+    <!-- Add new Regional/Zone -->
+    <div class="settings-section">
+      <div class="settings-section-title">➕ เพิ่ม Regional / Zone ใหม่</div>
+      <p style="font-size:0.8rem;color:var(--text3);margin-bottom:14px">เพิ่มชื่อ Regional หรือ Zone ใหม่ที่ต้องการใช้ในระบบ (จะปรากฏใน dropdown ทันที)</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <!-- Add Regional -->
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">🌏 เพิ่ม Regional ใหม่</div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div style="flex:1">
+              <label style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:4px">ชื่อ Regional (เช่น Regional 5)</label>
+              <input type="text" id="new-regional-name" class="s-fi" placeholder="Regional 5">
+            </div>
+            <button class="btn-add-zone" onclick="addNewRegional()">+ เพิ่ม</button>
+          </div>
+          <div id="regional-list-preview" style="margin-top:10px;font-size:0.75rem;color:var(--text3)"></div>
+        </div>
+        <!-- Add Zone -->
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">📍 เพิ่ม Zone ใหม่</div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <div style="flex:1">
+              <label style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:4px">ชื่อ Zone (เช่น Zone18)</label>
+              <input type="text" id="new-zone-name" class="s-fi" placeholder="Zone18">
+            </div>
+            <button class="btn-add-zone" onclick="addNewZone()">+ เพิ่ม</button>
+          </div>
+          <div id="zone-list-preview" style="margin-top:10px;font-size:0.75rem;color:var(--text3)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current config summary -->
+    <div class="settings-section">
+      <div class="settings-section-title">📋 สรุป Zone/Regional ที่มีในระบบ</div>
+      <div id="settings-summary-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
