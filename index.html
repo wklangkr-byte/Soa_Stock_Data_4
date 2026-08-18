@@ -542,7 +542,7 @@
     background: var(--canvas); border:1px solid var(--hairline-soft);
     border-radius:var(--r-xxxl); overflow:auto; box-shadow:var(--shadow-card);
   }
-  table { width:100%; border-collapse:collapse; font-size:0.78rem; min-width:1300px; table-layout:fixed; }
+  table { width:100%; border-collapse:collapse; font-size:0.78rem; table-layout:auto; }
   thead th {
     padding:10px 12px; text-align:center; font-size:0.63rem; font-weight:700;
     letter-spacing:0.08em; text-transform:uppercase; color:var(--steel);
@@ -574,7 +574,7 @@
 
   /* DESC cell */
   .desc-cell { position:relative; cursor:pointer; }
-  .desc-text { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--charcoal); font-size:0.75rem; transition:all 0.2s; }
+  .desc-text { display:block; white-space:normal; word-break:break-word; color:var(--charcoal); font-size:0.75rem; line-height:1.4; }
   .desc-cell.expanded .desc-text { white-space:normal; overflow:visible; text-overflow:unset; word-break:break-word; background:#fff9c4; border-radius:var(--r-sm); padding:3px 6px; border:1px solid #fde68a; color:var(--ink-deep); font-size:0.75rem; position:relative; z-index:5; }
   .desc-expand-btn {
     display:inline-flex; align-items:center; justify-content:center;
@@ -585,8 +585,8 @@
   .desc-expand-btn:hover { background:var(--primary); color:#fff; border-color:var(--primary); }
   .desc-cell.expanded .desc-expand-btn { background:var(--primary); color:#fff; border-color:var(--primary); transform:rotate(180deg); }
   .top5-desc-cell { position:relative; }
-  .top5-desc-text { display:inline-block; max-width:130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle; font-size:0.7rem; color:var(--stone); cursor:pointer; }
-  .top5-desc-cell.expanded .top5-desc-text { max-width:none; white-space:normal; overflow:visible; text-overflow:unset; word-break:break-word; background:#fff9c4; border-radius:var(--r-sm); padding:3px 6px; border:1px solid #fde68a; color:var(--ink-deep); font-size:0.7rem; position:relative; z-index:5; }
+  .top5-desc-text { display:inline-block; white-space:normal; word-break:break-word; vertical-align:middle; font-size:0.7rem; color:var(--stone); line-height:1.35; }
+  .top5-desc-cell.expanded .top5-desc-text { background:#fff9c4; border-radius:var(--r-sm); padding:3px 6px; border:1px solid #fde68a; color:var(--ink-deep); font-size:0.7rem; position:relative; z-index:5; }
 
   /* Badges — Meta style: pill shape */
   .badge { display:inline-flex; align-items:center; gap:3px; padding:3px 10px; border-radius:var(--r-full); font-size:0.64rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; }
@@ -1155,6 +1155,9 @@
           <option value="Short">Short</option>
           <option value="Pending">Pending</option>
         </select>
+        <select class="filter-sel" id="filter-status2" onchange="renderTable()">
+          <option value="">All Status2</option>
+        </select>
         <button class="dash-btn-clear" onclick="clearItemsFilter()" style="font-size:0.75rem;padding:6px 12px">
           <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           ล้างตัวกรอง
@@ -1165,42 +1168,42 @@
     <div class="table-wrap">
       <table id="items-table">
         <colgroup>
-          <col id="col-num"      style="width:42px">
-          <col id="col-date"     style="width:100px">
-          <col id="col-regional" style="width:96px">
-          <col id="col-store"    style="width:60px">
-          <col id="col-zone"     style="width:70px">
-          <col id="col-dept"     style="width:55px">
-          <col id="col-cls"      style="width:60px">
-          <col id="col-item"     style="width:80px">
-          <col id="col-desc"     style="width:200px">
-          <col id="col-price"    style="width:100px">
-          <col id="col-com"      style="width:60px">
-          <col id="col-count"    style="width:65px">
-          <col id="col-diff"     style="width:65px">
-          <col id="col-diffval"  style="width:110px">
-          <col id="col-remark"   style="width:100px">
-          <col id="col-status"   style="width:75px">
+          <col id="col-num"      style="width:38px">
+          <col id="col-date"     style="width:95px">
+          <col id="col-store"    style="width:52px">
+          <col id="col-dept"     style="width:46px">
+          <col id="col-cls"      style="width:50px">
+          <col id="col-item"     style="width:72px">
+          <col id="col-desc"     style="width:auto">
+          <col id="col-price"    style="width:88px">
+          <col id="col-com"      style="width:52px">
+          <col id="col-count"    style="width:55px">
+          <col id="col-diff"     style="width:52px">
+          <col id="col-pctdiff"  style="width:65px">
+          <col id="col-diffval"  style="width:100px">
+          <col id="col-remark"   style="width:110px">
+          <col id="col-status"   style="width:70px">
+          <col id="col-status2"  style="width:130px">
           <col id="col-action"   style="width:80px">
         </colgroup>
         <thead>
           <tr>
-            <th data-col="#" onclick="sortTable('#')">#<span class="sort-icon" id="si-#"></span><span class="col-resizer" onmousedown="startResize(event,'col-num')"></span></th>
-            <th data-col="createdAt" onclick="sortTable('createdAt')">Date<span class="sort-icon" id="si-createdAt"></span><span class="col-resizer" onmousedown="startResize(event,'col-date')"></span></th>
-            <th data-col="regional" onclick="sortTable('regional')">Regional<span class="sort-icon" id="si-regional"></span><span class="col-resizer" onmousedown="startResize(event,'col-regional')"></span></th>
-            <th data-col="storeNum" onclick="sortTable('storeNum')">Store<span class="sort-icon" id="si-storeNum"></span><span class="col-resizer" onmousedown="startResize(event,'col-store')"></span></th>
-            <th data-col="zone" onclick="sortTable('zone')">Zone<span class="sort-icon" id="si-zone"></span><span class="col-resizer" onmousedown="startResize(event,'col-zone')"></span></th>
-            <th data-col="dept" onclick="sortTable('dept')">Dept<span class="sort-icon" id="si-dept"></span><span class="col-resizer" onmousedown="startResize(event,'col-dept')"></span></th>
-            <th data-col="cls" onclick="sortTable('cls')">Class<span class="sort-icon" id="si-cls"></span><span class="col-resizer" onmousedown="startResize(event,'col-cls')"></span></th>
-            <th data-col="item" onclick="sortTable('item')">Item<span class="sort-icon" id="si-item"></span><span class="col-resizer" onmousedown="startResize(event,'col-item')"></span></th>
-            <th data-col="desc" onclick="sortTable('desc')">DESCRIPTION <span style="font-size:0.55rem;color:var(--text3);font-weight:400;text-transform:none">(คลิก▼ขยาย)</span><span class="sort-icon" id="si-desc"></span><span class="col-resizer" onmousedown="startResize(event,'col-desc')"></span></th>
-            <th class="r" data-col="price" onclick="sortTable('price')">ราคาสินค้า<span class="sort-icon" id="si-price"></span><span class="col-resizer" onmousedown="startResize(event,'col-price')"></span></th>
-            <th class="r" data-col="com" onclick="sortTable('com')">Com<span class="sort-icon" id="si-com"></span><span class="col-resizer" onmousedown="startResize(event,'col-com')"></span></th>
-            <th class="r" data-col="count" onclick="sortTable('count')">Count<span class="sort-icon" id="si-count"></span><span class="col-resizer" onmousedown="startResize(event,'col-count')"></span></th>
-            <th class="r" data-col="diff" onclick="sortTable('diff')">Diff<span class="sort-icon" id="si-diff"></span><span class="col-resizer" onmousedown="startResize(event,'col-diff')"></span></th>
-            <th class="r" data-col="diffVal" onclick="sortTable('diffVal')">มูลค่า Diff<span class="sort-icon" id="si-diffVal"></span><span class="col-resizer" onmousedown="startResize(event,'col-diffval')"></span></th>
-            <th data-col="remark" onclick="sortTable('remark')">Remark<span class="sort-icon" id="si-remark"></span><span class="col-resizer" onmousedown="startResize(event,'col-remark')"></span></th>
-            <th data-col="status" onclick="sortTable('status')">Status<span class="sort-icon" id="si-status"></span><span class="col-resizer" onmousedown="startResize(event,'col-status')"></span></th>
+            <th data-col="#" onclick="sortTable('#')">#<span class="sort-icon" id="si-#"></span></th>
+            <th data-col="createdAt" onclick="sortTable('createdAt')">Date<span class="sort-icon" id="si-createdAt"></span></th>
+            <th data-col="storeNum" onclick="sortTable('storeNum')">Store<span class="sort-icon" id="si-storeNum"></span></th>
+            <th data-col="dept" onclick="sortTable('dept')">Dept<span class="sort-icon" id="si-dept"></span></th>
+            <th data-col="cls" onclick="sortTable('cls')">Class<span class="sort-icon" id="si-cls"></span></th>
+            <th data-col="item" onclick="sortTable('item')">Item<span class="sort-icon" id="si-item"></span></th>
+            <th data-col="desc" onclick="sortTable('desc')">Description<span class="sort-icon" id="si-desc"></span></th>
+            <th class="r" data-col="price" onclick="sortTable('price')">ราคา<span class="sort-icon" id="si-price"></span></th>
+            <th class="r" data-col="com" onclick="sortTable('com')">Com<span class="sort-icon" id="si-com"></span></th>
+            <th class="r" data-col="count" onclick="sortTable('count')">Count<span class="sort-icon" id="si-count"></span></th>
+            <th class="r" data-col="diff" onclick="sortTable('diff')">Diff<span class="sort-icon" id="si-diff"></span></th>
+            <th class="r" data-col="pctDiff" onclick="sortTable('pctDiff')">% Diff<span class="sort-icon" id="si-pctDiff"></span></th>
+            <th class="r" data-col="diffVal" onclick="sortTable('diffVal')">มูลค่า Diff<span class="sort-icon" id="si-diffVal"></span></th>
+            <th data-col="remark" onclick="sortTable('remark')">Remark<span class="sort-icon" id="si-remark"></span></th>
+            <th data-col="status" onclick="sortTable('status')">Status<span class="sort-icon" id="si-status"></span></th>
+            <th data-col="status2" onclick="sortTable('status2')">Status2<span class="sort-icon" id="si-status2"></span></th>
             <th></th>
           </tr>
         </thead>
@@ -1307,6 +1310,28 @@
             <option value="Over">Over</option>
             <option value="Short">Short</option>
           </select>
+        </div>
+        <div class="field full"><label>Status2 Remark <span style="font-weight:400;text-transform:none;font-size:0.62rem;color:var(--text3)">(เลือกจากรายการ หรือเพิ่มสาเหตุใหม่)</span></label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="fs" id="f-status2" onchange="onStatus2Change()" style="flex:1">
+              <option value="">— ไม่ระบุ —</option>
+            </select>
+            <button type="button" onclick="showAddStatus2Inline()" class="btn-add-zone" id="btn-show-add-s2"
+              style="padding:6px 12px;font-size:0.72rem;white-space:nowrap;flex-shrink:0"
+              title="เพิ่มสาเหตุใหม่">＋ เพิ่มใหม่</button>
+          </div>
+          <!-- Inline add new status2 -->
+          <div id="status2-add-inline" style="display:none;margin-top:8px;padding:10px 12px;background:var(--surface2);border:1.5px solid var(--primary);border-radius:var(--r-lg);animation:slideUp 0.15s ease">
+            <div style="font-size:0.68rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">➕ เพิ่มสาเหตุใหม่</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="text" class="fi" id="f-status2-new" placeholder="พิมพ์ชื่อสาเหตุใหม่..."
+                style="flex:1;font-size:0.8rem" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmAddStatus2Inline()}">
+              <button type="button" onclick="confirmAddStatus2Inline()" class="btn-add-zone"
+                style="padding:6px 14px;font-size:0.72rem;white-space:nowrap">✓ เพิ่ม</button>
+              <button type="button" onclick="hideAddStatus2Inline()"
+                style="padding:6px 10px;font-size:0.72rem;background:transparent;border:1.5px solid var(--hairline);border-radius:var(--r-full);color:var(--charcoal);cursor:pointer;font-family:var(--font);white-space:nowrap">ยกเลิก</button>
+            </div>
+          </div>
         </div>
         <div class="field full"><label>Remark</label><textarea class="fta" id="f-remark" placeholder="หมายเหตุเพิ่มเติม..."></textarea></div>
       </div>
@@ -1497,7 +1522,24 @@ async function initFirebase() {
       const data = snapshot.val();
       if (data) {
         fbKeys = Object.keys(data);
-        items  = fbKeys.map(k => ({ ...data[k] }));
+        items  = fbKeys.map(k => {
+          const it = { ...data[k] };
+          // Ensure pctDiff is always calculated
+          const comV = parseFloat(it.com) || 0;
+          const diffV = parseFloat(it.diff) || 0;
+          if (it.pctDiff === undefined || it.pctDiff === null) {
+            it.pctDiff = comV !== 0
+              ? parseFloat(((diffV / comV) * 100).toFixed(2))
+              : (diffV === 0 ? 0 : (diffV > 0 ? 100 : -100));
+          }
+          // Auto-correct status: ±5% tolerance → Match
+          if (diffV === 0 || Math.abs(it.pctDiff) <= 5) {
+            it.status = 'Match';
+          } else if (it.status === 'Pending' || !it.status) {
+            it.status = diffV > 0 ? 'Over' : 'Short';
+          }
+          return it;
+        });
       } else {
         fbKeys = []; items = [];
       }
@@ -1680,13 +1722,20 @@ function calcDiff() {
   const price = parseFloat(document.getElementById('f-price').value) || 0;
   const diff  = count - com;
   const dv    = diff * price;
+  // Calculate % Diff = (Diff / Com) * 100
+  const pctDiff = com !== 0 ? (diff / com) * 100 : (diff === 0 ? 0 : (diff > 0 ? 100 : -100));
   document.getElementById('f-diff').value     = diff;
   document.getElementById('f-diff-val').value = dv.toFixed(2);
   const dc = diff>0?' calc-pos':diff<0?' calc-neg':'';
   const vc = dv>0?'  calc-pos':dv<0?' calc-neg':'';
   document.getElementById('f-diff').className     = 'fi calc' + dc;
   document.getElementById('f-diff-val').className = 'fi calc' + vc;
-  document.getElementById('f-status').value = diff===0?'Match':diff>0?'Over':'Short';
+  // Status logic: Match if diff=0 OR abs(%Diff) <= 5%
+  if (diff === 0 || Math.abs(pctDiff) <= 5) {
+    document.getElementById('f-status').value = 'Match';
+  } else {
+    document.getElementById('f-status').value = diff > 0 ? 'Over' : 'Short';
+  }
 }
 window.calcDiff = calcDiff;
 
@@ -1711,6 +1760,10 @@ function openModal(idx=-1) {
     };
     Object.entries(map).forEach(([id,v])=>document.getElementById(id).value=v||'');
     document.getElementById('f-status').value = it.status||'Pending';
+    // Populate STATUS2 dropdown then set value
+    populateStatus2Dropdown();
+    document.getElementById('f-status2').value = it.status2||'';
+    hideAddStatus2Inline();
     // Restore createdAt date for edit mode
     const existingDate = it.createdAt || it.updatedAt || new Date().toISOString();
     setModalDateValue(existingDate);
@@ -1738,6 +1791,9 @@ function openModal(idx=-1) {
     IDS.forEach(id=>{ const el=document.getElementById(id); if(el){el.value=''; el.style.borderColor='';} });
     ['f-diff','f-diff-val'].forEach(id=>{ document.getElementById(id).value=''; document.getElementById(id).className='fi calc'; });
     document.getElementById('f-status').value='Pending';
+    populateStatus2Dropdown();
+    document.getElementById('f-status2').value='';
+    hideAddStatus2Inline();
     document.getElementById('store-lookup-badge').style.display='none';
     document.getElementById('store-lookup-miss').style.display='none';
     const ib = document.getElementById('item-lookup-badge'); if(ib) ib.style.display='none';
@@ -1780,6 +1836,16 @@ function saveItem() {
   const price = parseFloat(document.getElementById('f-price').value) || 0;
   const diff  = count - com;
   const diffVal = diff * price;
+  // Calculate % Diff
+  const pctDiff = com !== 0 ? parseFloat(((diff / com) * 100).toFixed(2)) : (diff === 0 ? 0 : (diff > 0 ? 100 : -100));
+  // Auto-correct status based on ±5% tolerance
+  let finalStatus = document.getElementById('f-status').value;
+  if (diff === 0 || Math.abs(pctDiff) <= 5) {
+    finalStatus = 'Match';
+  } else if (finalStatus === 'Match' && Math.abs(pctDiff) > 5) {
+    // Prevent manual Match if actually > 5%
+    finalStatus = diff > 0 ? 'Over' : 'Short';
+  }
   // Convert datetime-local value → ISO string (treat as Asia/Bangkok time)
   const createdAtISO = dateVal
     ? new Date(dateVal).toISOString()
@@ -1793,9 +1859,10 @@ function saveItem() {
     cls      : document.getElementById('f-class').value.trim(),
     item     : document.getElementById('f-item').value.trim(),
     desc     : document.getElementById('f-desc').value.trim(),
-    price, com, count, diff, diffVal,
+    price, com, count, diff, diffVal, pctDiff,
     remark   : document.getElementById('f-remark').value.trim(),
-    status   : document.getElementById('f-status').value,
+    status   : finalStatus,
+    status2  : document.getElementById('f-status2').value || '',
     createdAt: editIndex>=0 ? (document.getElementById('f-created-at').value
                   ? new Date(document.getElementById('f-created-at').value).toISOString()
                   : items[editIndex].createdAt)
@@ -1944,6 +2011,7 @@ function renderTable() {
   const fst     = document.getElementById('filter-store').value;
   const fz      = document.getElementById('filter-zone').value;
   const fstat   = document.getElementById('filter-status').value;
+  const fstat2  = document.getElementById('filter-status2') ? document.getElementById('filter-status2').value : '';
   const fdept   = document.getElementById('filter-dept') ? document.getElementById('filter-dept').value : '';
   const fcls    = document.getElementById('filter-class') ? document.getElementById('filter-class').value : '';
   const dateFrom= document.getElementById('items-date-from') ? document.getElementById('items-date-from').value : '';
@@ -1958,6 +2026,7 @@ function renderTable() {
     if (fst  && (it.storeNum||it.store) !== fst) return false;
     if (fz   && it.zone !== fz) return false;
     if (fstat && it.status !== fstat) return false;
+    if (fstat2 && (it.status2||'') !== fstat2) return false;
     if (fdept && it.dept !== fdept) return false;
     if (fcls  && it.cls !== fcls) return false;
     if (fromMs !== null || toMs !== null) {
@@ -1975,7 +2044,7 @@ function renderTable() {
     filtered.sort((a, b) => {
       let va = a[sortCol] ?? '';
       let vb = b[sortCol] ?? '';
-      if (['com','price','count','diff','diffVal'].includes(sortCol)) {
+      if (['com','price','count','diff','diffVal','pctDiff'].includes(sortCol)) {
         va = parseFloat(va) || 0; vb = parseFloat(vb) || 0;
         return (va - vb) * sortDir;
       }
@@ -1997,7 +2066,7 @@ function renderTable() {
   // Update filter result badge
   const resultEl = document.getElementById('items-filter-result');
   if (resultEl) {
-    const hasFilter = q || fr || fst || fz || fstat || fdept || fcls || dateFrom || dateTo;
+    const hasFilter = q || fr || fst || fz || fstat || fstat2 || fdept || fcls || dateFrom || dateTo;
     if (hasFilter) {
       const parts = [];
       if (dateFrom) parts.push(`จาก ${new Date(dateFrom).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})}`);
@@ -2008,6 +2077,7 @@ function renderTable() {
       if (fdept)  parts.push(`🏷️ Dept: ${fdept}`);
       if (fcls)   parts.push(`📂 Class: ${fcls}`);
       if (fstat)  parts.push(`Status: ${fstat}`);
+      if (fstat2) parts.push(`Status2: ${fstat2}`);
       if (q)      parts.push(`"${q}"`);
       resultEl.className = 'items-filter-result active filtered';
       resultEl.textContent = `⚡ ${filtered.length} รายการ${parts.length ? ' · ' + parts.join(' · ') : ''}`;
@@ -2048,33 +2118,41 @@ function renderTable() {
     const dvp = it.diffVal>=0?'+':'';
     const dvc = it.diffVal>0?'c-pos':it.diffVal<0?'c-neg':'c-zero';
     const displayStore = it.storeNum || it.store || '';
+    // Calculate % Diff dynamically (for backward-compatible data that lacks pctDiff field)
+    const comVal = parseFloat(it.com) || 0;
+    const diffVal = parseFloat(it.diff) || 0;
+    const pctDiffCalc = it.pctDiff !== undefined && it.pctDiff !== null
+      ? parseFloat(it.pctDiff)
+      : (comVal !== 0 ? (diffVal / comVal) * 100 : (diffVal === 0 ? 0 : (diffVal > 0 ? 100 : -100)));
+    const pctStr = pctDiffCalc === 0 ? '0%'
+      : (pctDiffCalc > 0 ? '+' : '') + pctDiffCalc.toFixed(1) + '%';
+    const pctCls = Math.abs(pctDiffCalc) <= 5 ? 'c-zero'
+      : (pctDiffCalc > 0 ? 'c-pos' : 'c-neg');
+    // Tolerance badge: show ✓ if within ±5%
+    const tolBadge = (diffVal !== 0 && Math.abs(pctDiffCalc) <= 5)
+      ? '<div style="font-size:0.55rem;color:#059669;font-weight:700;line-height:1">±5%✓</div>' : '';
     return `<tr>
       <td style="color:var(--text3);font-size:0.72rem;font-family:var(--font-mono);text-align:center">${i+1}</td>
       <td style="white-space:nowrap;text-align:center">${fmtDate(it.createdAt)}</td>
-      <td class="td-reg">${it.regional||''}</td>
       <td class="td-store" style="font-family:var(--font-mono);font-weight:700;color:var(--accent);text-align:center">${displayStore}</td>
-      <td class="td-zone" style="text-align:center">${it.zone||''}</td>
       <td style="color:var(--text2);text-align:center;white-space:nowrap">${it.dept||''}</td>
       <td style="color:var(--text3);font-family:var(--font-mono);font-size:0.73rem;text-align:center;white-space:nowrap">${it.cls||''}</td>
       <td class="td-item" style="text-align:center">${it.item||''}</td>
-      <td class="desc-cell" onclick="toggleDesc(this)" title="${(it.desc||'').replace(/"/g,'&quot;')}">
-        <div style="display:flex;align-items:center;gap:2px">
-          <span class="desc-text">${it.desc||''}</span>
-          ${(it.desc||'').length > 0 ? '<span class="desc-expand-btn" title="คลิกเพื่อขยาย/ย่อ">▼</span>' : ''}
-        </div>
-      </td>
-      <td class="td-num bold" style="text-align:right">${fmtB(it.price||0)}</td>
+      <td style="color:var(--charcoal);font-size:0.75rem;line-height:1.4">${it.desc||''}</td>
+      <td class="td-num bold" style="text-align:right;white-space:nowrap">${fmtB(it.price||0)}</td>
       <td class="td-num" style="color:var(--text2);text-align:right">${fmt(it.com||0)}</td>
       <td class="td-num bold" style="text-align:right">${fmt(it.count||0)}</td>
       <td class="td-num bold ${dc}" style="text-align:right">${it.diff>0?'+':''}${fmt(it.diff||0)}</td>
-      <td class="td-num bold ${dvc}" style="text-align:right">${dvp}${fmtB(it.diffVal||0)}</td>
+      <td class="td-num bold ${pctCls}" style="text-align:center;white-space:nowrap" title="% Diff = (Diff÷Com)×100">${pctStr}${tolBadge}</td>
+      <td class="td-num bold ${dvc}" style="text-align:right;white-space:nowrap">${dvp}${fmtB(it.diffVal||0)}</td>
       <td class="desc-cell" onclick="toggleDesc(this)" title="${(it.remark||'').replace(/"/g,'&quot;')}">
         <div style="display:flex;align-items:center;gap:2px">
-          <span class="desc-text" style="color:var(--text3);font-size:0.72rem">${it.remark||''}</span>
+          <span class="desc-text" style="color:var(--text3);font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px">${it.remark||''}</span>
           ${(it.remark||'').length > 0 ? '<span class="desc-expand-btn" title="คลิกเพื่อขยาย/ย่อ">▼</span>' : ''}
         </div>
       </td>
       <td style="text-align:center"><span class="badge ${sm[it.status]||'pending'}">${it.status||'Pending'}</span></td>
+      <td style="text-align:center;white-space:nowrap">${it.status2 ? `<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:0.62rem;font-weight:700;background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;white-space:nowrap" title="${(it.status2||'').replace(/"/g,'&quot;')}">${it.status2}</span>` : '<span style="color:var(--text3);font-size:0.65rem">—</span>'}</td>
       <td style="white-space:nowrap;text-align:center">
         <button class="action-btn" onclick="openModal(${ri})">Edit</button>
         ${currentRole==='admin'?`<button class="action-btn" onclick="deleteItem(${ri})" style="margin-left:3px;color:var(--red-lt)">Del</button>`:''}
@@ -2221,7 +2299,7 @@ window.onItemsDeptChange = onItemsDeptChange;
    CLEAR ITEMS FILTER
 ══════════════════════════════════════════ */
 function clearItemsFilter() {
-  const ids = ['search-input','items-date-from','items-date-to','filter-regional','filter-store','filter-zone','filter-dept','filter-class','filter-status'];
+  const ids = ['search-input','items-date-from','items-date-to','filter-regional','filter-store','filter-zone','filter-dept','filter-class','filter-status','filter-status2'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   // Re-build all dropdowns to full list
   _cascadeItemsStore(false);
@@ -2242,6 +2320,7 @@ function exportExcel() {
   const fst     = document.getElementById('filter-store').value;
   const fz      = document.getElementById('filter-zone').value;
   const fstat   = document.getElementById('filter-status').value;
+  const fstat2  = document.getElementById('filter-status2') ? document.getElementById('filter-status2').value : '';
   const fdept   = document.getElementById('filter-dept') ? document.getElementById('filter-dept').value : '';
   const fcls    = document.getElementById('filter-class') ? document.getElementById('filter-class').value : '';
   const dateFrom= document.getElementById('items-date-from') ? document.getElementById('items-date-from').value : '';
@@ -2255,6 +2334,7 @@ function exportExcel() {
     if (fst  && (it.storeNum||it.store) !== fst) return false;
     if (fz   && it.zone !== fz) return false;
     if (fstat && it.status !== fstat) return false;
+    if (fstat2 && (it.status2||'') !== fstat2) return false;
     if (fdept && it.dept !== fdept) return false;
     if (fcls  && it.cls  !== fcls)  return false;
     if (fromMs !== null || toMs !== null) {
@@ -2267,7 +2347,7 @@ function exportExcel() {
     return true;
   });
   if (!data.length) { alert('ไม่มีข้อมูลในตัวกรองที่เลือก'); return; }
-  const headers = ['#','Regional','วันที่บันทึก','Store','Zone','Dept','Class','Item','Description','ราคาสินค้า (฿)','Com','Count','Diff','มูลค่า Diff (฿)','Remark','Status','แก้ไขล่าสุด','แก้ไขโดย'];
+  const headers = ['#','Regional','วันที่บันทึก','Store','Zone','Dept','Class','Item','Description','ราคาสินค้า (฿)','Com','Count','Diff','% Diff','มูลค่า Diff (฿)','Remark','Status','Status2 Remark','แก้ไขล่าสุด','แก้ไขโดย'];
   const rows = data.map((it,i)=>{
     const toThaiDate = iso => {
       if (!iso) return '';
@@ -2279,18 +2359,25 @@ function exportExcel() {
         });
       } catch { return iso; }
     };
+    // Calculate % Diff for export
+    const comVal = parseFloat(it.com) || 0;
+    const diffNum = parseFloat(it.diff) || 0;
+    const pctDiffEx = it.pctDiff !== undefined && it.pctDiff !== null
+      ? parseFloat(it.pctDiff)
+      : (comVal !== 0 ? parseFloat(((diffNum / comVal) * 100).toFixed(2)) : (diffNum === 0 ? 0 : (diffNum > 0 ? 100 : -100)));
     return [
       i+1, it.regional,
       toThaiDate(it.createdAt),
       it.storeNum||it.store, it.zone, it.dept, it.cls, it.item, it.desc,
-      it.price, it.com, it.count, it.diff, parseFloat((it.diffVal||0).toFixed(2)),
-      it.remark, it.status,
+      it.price, it.com, it.count, it.diff, pctDiffEx,
+      parseFloat((it.diffVal||0).toFixed(2)),
+      it.remark, it.status, it.status2||'',
       toThaiDate(it.updatedAt),
       it.updatedBy || ''
     ];
   });
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-  ws['!cols'] = [4,14,20,8,14,8,14,28,8,14,8,8,16,20,10,14,14,12].map(w=>({wch:w}));
+  ws['!cols'] = [4,14,20,8,14,8,14,28,8,14,8,8,10,16,20,10,14,18,14,12].map(w=>({wch:w}));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'SOA STOCK Data');
   const sm={};
@@ -2656,11 +2743,8 @@ function renderDashboard() {
       <td><span class="rank-badge ${rankCls}">${i+1}</span></td>
       <td style="font-family:var(--font-mono);font-weight:700;color:var(--accent);font-size:0.78rem;white-space:nowrap">${g.store}</td>
       <td style="font-weight:600;font-size:0.78rem;white-space:nowrap">${g.item}${rowsLabel}</td>
-      <td class="top5-desc-cell" onclick="toggleDesc(this)" title="${safeDesc}" style="cursor:pointer;max-width:160px">
-        <div style="display:flex;align-items:center;gap:3px">
-          <span class="top5-desc-text">${g.desc||'—'}</span>
-          ${g.desc ? '<span class="desc-expand-btn" title="คลิกเพื่อขยาย/ย่อ">▼</span>' : ''}
-        </div>
+      <td style="font-size:0.7rem;color:var(--stone);line-height:1.35;word-break:break-word" title="${safeDesc}">
+          ${g.desc||'—'}
       </td>
       <td class="r" style="color:${color};font-family:var(--font-mono);font-weight:700;font-size:0.77rem;white-space:nowrap">
         ${sign}${fmtB0(g.diffVal)}
@@ -3094,12 +3178,244 @@ document.addEventListener('DOMContentLoaded', () => {
       clearInterval(_zcInt);
       loadZoneConfig().then(() => {
         listenZoneConfig();
-        if (currentRole) { syncFilters(); renderDashboard(); renderTable(); }
+        loadStatus2Config().then(() => {
+          listenStatus2Config();
+          populateStatus2Filter();
+          if (currentRole) { syncFilters(); renderDashboard(); renderTable(); }
+        });
       });
     }
   }, 300);
   setTimeout(() => clearInterval(_zcInt), 20000);
 });
+
+/* ══════════════════════════════════════════
+   STATUS2 REMARK MANAGEMENT
+   ─ Default options + custom options from Firebase
+══════════════════════════════════════════ */
+const STATUS2_CONFIG_PATH = 'soa_status2_config';
+const STATUS2_DEFAULTS = [
+  'CFDA Aging',
+  'Monthly Count',
+  'Negative Stock Greater Than 5 Day',
+  'Aging',
+  'Shrinkage'
+];
+let STATUS2_CUSTOM = [];   // additional options from Firebase
+
+function getAllStatus2Options() {
+  const merged = [...STATUS2_DEFAULTS];
+  STATUS2_CUSTOM.forEach(v => { if (!merged.includes(v)) merged.push(v); });
+  return merged;
+}
+
+async function loadStatus2Config() {
+  if (!db || !onValue) return;
+  try {
+    const snap = await new Promise((res, rej) => {
+      onValue(ref(db, STATUS2_CONFIG_PATH), res, rej, { onlyOnce: true });
+    });
+    const data = snap.val();
+    if (Array.isArray(data)) STATUS2_CUSTOM = data;
+    else if (data && typeof data === 'object') STATUS2_CUSTOM = Object.values(data);
+    else STATUS2_CUSTOM = [];
+  } catch(e) { console.warn('loadStatus2Config:', e); }
+}
+
+function listenStatus2Config() {
+  if (!db || !onValue) return;
+  onValue(ref(db, STATUS2_CONFIG_PATH), (snap) => {
+    const data = snap.val();
+    if (Array.isArray(data)) STATUS2_CUSTOM = data;
+    else if (data && typeof data === 'object') STATUS2_CUSTOM = Object.values(data);
+    else STATUS2_CUSTOM = [];
+    populateStatus2Filter();
+    // Refresh settings page if open
+    if (document.getElementById('page-settings')?.classList.contains('active')) {
+      renderStatus2Preview();
+    }
+  });
+}
+
+async function saveStatus2Config(arr) {
+  if (!db) { toast('⚠ ไม่ได้เชื่อมต่อ Firebase'); return false; }
+  try {
+    await set(ref(db, STATUS2_CONFIG_PATH), arr.length > 0 ? arr : null);
+    return true;
+  } catch(e) { console.error('saveStatus2Config:', e); return false; }
+}
+
+function populateStatus2Dropdown() {
+  const sel = document.getElementById('f-status2');
+  if (!sel) return;
+  const cur = sel.value;
+  const opts = getAllStatus2Options();
+  sel.innerHTML = '<option value="">— ไม่ระบุ —</option>' +
+    opts.map(v => `<option value="${v}"${v === cur ? ' selected' : ''}>${v}</option>`).join('');
+  if (opts.includes(cur)) sel.value = cur;
+}
+window.populateStatus2Dropdown = populateStatus2Dropdown;
+
+function showAddStatus2Inline() {
+  const wrap = document.getElementById('status2-add-inline');
+  if (wrap) { wrap.style.display = 'block'; }
+  const inp = document.getElementById('f-status2-new');
+  if (inp) { inp.value = ''; setTimeout(() => inp.focus(), 50); }
+}
+window.showAddStatus2Inline = showAddStatus2Inline;
+
+function hideAddStatus2Inline() {
+  const wrap = document.getElementById('status2-add-inline');
+  if (wrap) wrap.style.display = 'none';
+}
+window.hideAddStatus2Inline = hideAddStatus2Inline;
+
+function confirmAddStatus2Inline() {
+  const inp = document.getElementById('f-status2-new');
+  const val = (inp?.value || '').trim();
+  if (!val) { toast('⚠ กรุณาพิมพ์ชื่อสาเหตุ'); inp?.focus(); return; }
+  if (getAllStatus2Options().includes(val)) {
+    // Already exists — just select it
+    document.getElementById('f-status2').value = val;
+    hideAddStatus2Inline();
+    toast(`ℹ️ "${val}" มีอยู่แล้ว — เลือกให้แล้ว`);
+    return;
+  }
+  // Add to custom list and save to Firebase
+  STATUS2_CUSTOM.push(val);
+  saveStatus2Config(STATUS2_CUSTOM).then(ok => {
+    if (ok) {
+      populateStatus2Dropdown();
+      document.getElementById('f-status2').value = val;
+      hideAddStatus2Inline();
+      populateStatus2Filter();
+      toast(`✔ เพิ่ม "${val}" และเลือกให้แล้ว`);
+    }
+  });
+}
+window.confirmAddStatus2Inline = confirmAddStatus2Inline;
+
+function onStatus2Change() {
+  // Nothing special needed, just in case future logic
+}
+window.onStatus2Change = onStatus2Change;
+
+function populateStatus2Filter() {
+  const sel = document.getElementById('filter-status2');
+  if (!sel) return;
+  const cur = sel.value;
+  // Collect used status2 from items + all defined options
+  const used = new Set(items.map(it => it.status2).filter(Boolean));
+  getAllStatus2Options().forEach(v => used.add(v));
+  const opts = [...used].sort((a, b) => a.localeCompare(b, 'th'));
+  sel.innerHTML = '<option value="">All Status2</option>' +
+    opts.map(v => `<option value="${v}"${v === cur ? ' selected' : ''}>${v}</option>`).join('');
+  if (opts.includes(cur)) sel.value = cur;
+}
+
+/* ── Add new Status2 option (Settings page) ── */
+function addNewStatus2() {
+  const inp = document.getElementById('new-status2-name');
+  const val = (inp?.value || '').trim();
+  if (!val) { toast('⚠ กรุณากรอกชื่อ Status2 Remark'); return; }
+  if (getAllStatus2Options().includes(val)) { toast('⚠ รายการนี้มีอยู่แล้ว'); return; }
+  STATUS2_CUSTOM.push(val);
+  saveStatus2Config(STATUS2_CUSTOM).then(ok => {
+    if (ok) {
+      toast(`✔ เพิ่ม "${val}" แล้ว`);
+      if (inp) inp.value = '';
+      renderStatus2Preview();
+      populateStatus2Filter();
+    }
+  });
+}
+window.addNewStatus2 = addNewStatus2;
+
+function removeStatus2(val) {
+  if (!confirm(`ลบ "${val}" ออกจากรายการ Status2 Remark?`)) return;
+  STATUS2_CUSTOM = STATUS2_CUSTOM.filter(v => v !== val);
+  saveStatus2Config(STATUS2_CUSTOM).then(ok => {
+    if (ok) {
+      toast(`✔ ลบ "${val}" แล้ว`);
+      renderStatus2Preview();
+      populateStatus2Filter();
+      populateStatus2Dropdown();
+    }
+  });
+}
+window.removeStatus2 = removeStatus2;
+
+function editStatus2(oldVal) {
+  const newVal = prompt(`แก้ไขชื่อสาเหตุ:`, oldVal);
+  if (newVal === null) return;  // cancelled
+  const trimmed = newVal.trim();
+  if (!trimmed) { toast('⚠ ชื่อสาเหตุต้องไม่เป็นค่าว่าง'); return; }
+  if (trimmed === oldVal) return; // no change
+  if (getAllStatus2Options().includes(trimmed)) { toast('⚠ ชื่อนี้มีอยู่แล้ว'); return; }
+
+  const isDef = STATUS2_DEFAULTS.includes(oldVal);
+  if (isDef) {
+    // For defaults: add the new name as custom, can't remove default
+    // But we'll treat it as a rename by adding new + hiding old via a rename map
+    // Simpler: just add the corrected one as custom
+    STATUS2_CUSTOM.push(trimmed);
+  } else {
+    // For custom: replace in-place
+    const idx = STATUS2_CUSTOM.indexOf(oldVal);
+    if (idx >= 0) STATUS2_CUSTOM[idx] = trimmed;
+    else STATUS2_CUSTOM.push(trimmed);
+  }
+
+  saveStatus2Config(STATUS2_CUSTOM).then(ok => {
+    if (ok) {
+      // Update all existing items that use the old value
+      if (db && items.length > 0) {
+        const updates = {};
+        items.forEach((it, i) => {
+          if (it.status2 === oldVal && fbKeys[i]) {
+            updates[`${DB_PATH}/${fbKeys[i]}/status2`] = trimmed;
+          }
+        });
+        if (Object.keys(updates).length > 0) {
+          update(ref(db), updates)
+            .then(() => toast(`✔ แก้ไข "${oldVal}" → "${trimmed}" พร้อมอัปเดต ${Object.keys(updates).length} รายการ`))
+            .catch(e => toast('⚠ แก้ไขชื่อสำเร็จ แต่อัปเดตข้อมูลเดิมไม่สำเร็จ: ' + e.message));
+        } else {
+          toast(`✔ แก้ไข "${oldVal}" → "${trimmed}"`);
+        }
+      } else {
+        toast(`✔ แก้ไข "${oldVal}" → "${trimmed}"`);
+      }
+      renderStatus2Preview();
+      populateStatus2Filter();
+      populateStatus2Dropdown();
+    }
+  });
+}
+window.editStatus2 = editStatus2;
+
+function renderStatus2Preview() {
+  const el = document.getElementById('status2-list-preview');
+  if (!el) return;
+  const all = getAllStatus2Options();
+  el.innerHTML = all.map(v => {
+    const isDef = STATUS2_DEFAULTS.includes(v);
+    const esc = v.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `<div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:${isDef ? 'var(--surface3)' : '#e0f2fe'};border:1px solid ${isDef ? 'var(--hairline)' : '#7dd3fc'};border-radius:99px;margin:3px;font-size:0.72rem;font-weight:600;color:${isDef ? 'var(--charcoal)' : '#0369a1'}">
+      ${isDef ? '🔒' : '✏️'} ${v}
+      <button onclick="editStatus2('${esc}')" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:0.68rem;padding:0 2px;font-weight:700" title="แก้ไข">✎</button>
+      ${!isDef ? `<button onclick="removeStatus2('${esc}')" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.75rem;padding:0 2px;font-weight:700" title="ลบ">✕</button>` : ''}
+    </div>`;
+  }).join('');
+}
+window.renderStatus2Preview = renderStatus2Preview;
+
+/* ── Patch renderSettingsPage to also render STATUS2 ── */
+const _origRenderSettingsPage = window.renderSettingsPage;
+window.renderSettingsPage = function() {
+  _origRenderSettingsPage();
+  renderStatus2Preview();
+};
 
 
 </script>
@@ -3109,8 +3425,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="settings-page">
     <div class="page-header">
       <div>
-        <h1>⚙️ Settings — Zone &amp; Regional Management</h1>
-        <p>จัดการการกำหนด Regional และ Zone ให้แต่ละสาขา (Admin Only)</p>
+        <h1>⚙️ Settings — Zone, Regional &amp; Status2 Management</h1>
+        <p>จัดการการกำหนด Regional, Zone และ Status2 Remark (Admin Only)</p>
       </div>
     </div>
 
@@ -3195,6 +3511,25 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div id="zone-list-preview" style="margin-top:10px;font-size:0.75rem;color:var(--text3)"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- STATUS2 Remark Management -->
+    <div class="settings-section">
+      <div class="settings-section-title">📋 จัดการ Status2 Remark — เงื่อนไขการนับ</div>
+      <p style="font-size:0.8rem;color:var(--text3);margin-bottom:14px">
+        เพิ่มเงื่อนไข Status2 Remark ใหม่ที่ต้องการใช้ใน dropdown (รายการ 🔒 เป็นค่าเริ่มต้น ลบไม่ได้ · รายการ ✏️ เพิ่มเอง ลบได้)
+      </p>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">📝 เพิ่ม Status2 Remark ใหม่</div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div style="flex:1">
+            <label style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:4px">ชื่อเงื่อนไข (เช่น Cycle Count)</label>
+            <input type="text" id="new-status2-name" class="s-fi" placeholder="ชื่อเงื่อนไขใหม่..." onkeydown="if(event.key==='Enter')addNewStatus2()">
+          </div>
+          <button class="btn-add-zone" onclick="addNewStatus2()">+ เพิ่ม</button>
+        </div>
+        <div id="status2-list-preview" style="margin-top:12px"></div>
       </div>
     </div>
 
