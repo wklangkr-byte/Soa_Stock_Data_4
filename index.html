@@ -782,6 +782,45 @@
   .hidden { display:none !important; }
   .diff-pos{color:var(--success);} .diff-neg{color:var(--critical);} .diff-zero{color:var(--stone);}
 
+
+/* ── Drill-down & Purge (added) ── */
+.drill{cursor:pointer}
+tr.drill:hover td{background:rgba(37,99,235,.09)!important}
+.regional-card.drill:hover,.kpi-card.drill:hover{outline:2px solid var(--primary);outline-offset:-2px}
+.dept-bar-row.drill:hover{background:rgba(37,99,235,.09);border-radius:8px}
+.leg-item.drill:hover{background:rgba(0,0,0,.06);border-radius:8px}
+.drill-hint{font-size:.68rem;font-weight:600;color:var(--primary);margin-left:10px;opacity:.85}
+#drill-banner{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;margin:0 0 12px;border-radius:12px;background:rgba(37,99,235,.08);border:1.5px solid var(--primary);font-size:.8rem}
+#drill-banner.show{display:flex}
+#drill-banner .db-txt{flex:1;min-width:200px;font-weight:600}
+#drill-banner button{padding:6px 14px;border-radius:99px;border:1.5px solid var(--primary);background:#fff;color:var(--primary);font-weight:700;font-size:.74rem;cursor:pointer;font-family:inherit}
+#drill-banner button.pri{background:var(--primary);color:#fff}
+.purge-box{border:1.5px solid #fecaca;background:rgba(254,226,226,.35);border-radius:12px;padding:14px}
+.purge-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin:10px 0}
+.purge-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1.5px solid var(--hairline);border-radius:10px;background:#fff;cursor:pointer;font-size:.8rem}
+.purge-item:hover{border-color:#dc2626}
+.purge-item .pm-n{margin-left:auto;font-family:var(--font-mono);font-size:.72rem;color:var(--text3)}
+.purge-item .pm-cur{font-size:.6rem;font-weight:700;background:#fef3c7;color:#92400e;border-radius:99px;padding:1px 7px}
+.purge-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn-purge{padding:8px 18px;border:none;border-radius:99px;background:#dc2626;color:#fff;font-weight:700;font-size:.78rem;cursor:pointer;font-family:inherit}
+.btn-purge:hover{filter:brightness(1.08)}
+.btn-purge-sec{padding:7px 14px;border:1.5px solid var(--hairline);border-radius:99px;background:var(--surface-soft);color:var(--charcoal);font-weight:600;font-size:.74rem;cursor:pointer;font-family:inherit}
+
+/* ── Coverage & Add Item (added) ── */
+.cov-bar{height:10px;border-radius:99px;background:#e2e8f0;overflow:hidden;min-width:90px}
+.cov-bar>i{display:block;height:100%;border-radius:99px}
+.cov-reg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.cov-reg{border:1.5px solid var(--hairline);border-radius:14px;padding:14px;background:#fff}
+.cov-pct{font-size:1.7rem;font-weight:800;font-family:var(--font-mono)}
+.cov-chip{display:inline-block;margin:1px 3px 1px 0;padding:1px 8px;border-radius:99px;font-size:.66rem;font-family:var(--font-mono);font-weight:700}
+.cov-chip.ok{background:rgba(5,150,105,.16);color:#047857}
+.cov-chip.no{background:#fee2e2;color:#b91c1c}
+.cov-badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.66rem;font-weight:700;white-space:nowrap}
+.cov-badge.done{background:rgba(5,150,105,.16);color:#047857}
+.cov-badge.prog{background:#fef3c7;color:#92400e}
+.cov-badge.none{background:#fee2e2;color:#b91c1c}
+.ai-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
+.ai-grid label{display:block;font-size:.68rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -830,9 +869,11 @@
     <div class="nav-logo-sub">Inventory Management System</div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
-    <button class="nav-tab" onclick="showPage('items')">รายการสินค้า</button>
-    <button class="nav-tab" id="nav-tab-settings" onclick="showPage('settings')" style="display:none">⚙️ Settings</button>
+    <button class="nav-tab active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" data-page="items" onclick="showPage('items')">รายการสินค้า</button>
+    <button class="nav-tab" data-page="coverage" onclick="showPage('coverage')">📊 สถานะการบันทึก</button>
+    <button class="nav-tab" data-page="additem" id="nav-tab-additem" onclick="showPage('additem')" style="display:none">➕ เพิ่ม Item ใหม่</button>
+    <button class="nav-tab" data-page="settings" id="nav-tab-settings" onclick="showPage('settings')" style="display:none">⚙️ Settings</button>
   </div>
   <div class="nav-right">
     <div class="nav-user-badge" id="nav-user-badge">
@@ -878,10 +919,61 @@
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
     สินค้า
   </button>
+  <button class="m-tab" id="mtab-coverage" onclick="showPage('coverage')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    สถานะ
+  </button>
+  <button class="m-tab" id="mtab-additem" onclick="showPage('additem')" style="display:none">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4"/></svg>
+    เพิ่ม Item
+  </button>
   <button class="m-tab" id="mtab-settings" onclick="showPage('settings')" style="display:none">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="1.8"/></svg>
     Settings
   </button>
+</div>
+
+<!-- ═══ COVERAGE PAGE ═══ -->
+<div id="page-coverage" class="page">
+  <div class="dashboard">
+    <div class="page-header"><div><h1>📊 สถานะการบันทึกข้อมูลรายสาขา</h1><p>สาขาที่บันทึกเข้าระบบแล้ว เทียบกับที่ยังไม่บันทึก แยกตาม Regional และ Position</p></div></div>
+    <div class="chart-card" style="margin-bottom:14px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.78rem">
+        <span style="font-weight:700">📅 ช่วงวันที่</span>
+        <input type="date" id="cov-from" class="filter-sel" onchange="renderCoverage()"> ถึง
+        <input type="date" id="cov-to" class="filter-sel" onchange="renderCoverage()">
+        <button class="btn-purge-sec" onclick="document.getElementById('cov-from').value='';document.getElementById('cov-to').value='';renderCoverage()">ล้าง</button>
+        <label style="display:flex;gap:6px;align-items:center;margin-left:auto"><input type="checkbox" id="cov-only-pending" onchange="renderCoverage()"> แสดงเฉพาะ Position ที่ยังไม่ครบ</label>
+      </div>
+    </div>
+    <div id="cov-kpi"></div>
+    <div class="chart-card" style="margin-bottom:14px"><div class="card-title">🌏 ความคืบหน้าแยกตาม Regional</div><div class="cov-reg-grid" id="cov-regional"></div></div>
+    <div class="chart-card" style="margin-bottom:14px"><div class="card-title">👤 ความคืบหน้าแยกตาม Position (SOA / Inven)<span class="drill-hint">🟩 บันทึกแล้ว · 🟥 ยังไม่บันทึก · คลิกชิปสีเขียวเพื่อดูรายการ</span></div><div id="cov-position"></div></div>
+  </div>
+</div>
+
+<!-- ═══ ADD NEW ITEM PAGE (Admin + User) ═══ -->
+<div id="page-additem" class="page">
+  <div class="dashboard">
+    <div class="page-header"><div><h1>➕ เพิ่ม Item ใหม่ (Manual)</h1><p>เพิ่มรายการสินค้าใหม่เข้าระบบ — เมื่อบันทึกแล้ว ทุกคนพิมพ์รหัสสินค้านี้ในฟอร์มกรอกข้อมูลจะเติม Dept / Class / ชื่อ / ราคา ให้อัตโนมัติ (Admin และ User เพิ่มได้ · User แก้ไข/ลบได้เฉพาะรายการที่ตนเองเพิ่ม)</p></div></div>
+    <div class="chart-card" style="margin-bottom:14px">
+      <div class="card-title" id="ai-form-title">รายการสินค้าใหม่</div>
+      <div class="ai-grid">
+        <div><label>รหัสสินค้า (Item) *</label><input class="fi" id="ai-code" placeholder="เช่น 999001" oninput="aiCheckCode()"></div>
+        <div><label>Dept *</label><input class="fi" id="ai-dept" placeholder="เช่น 41"></div>
+        <div><label>Class *</label><input class="fi" id="ai-class" placeholder="เช่น 963"></div>
+        <div><label>ราคาขาย (฿)</label><input class="fi" id="ai-price" type="number" step="0.01" min="0" placeholder="0.00"></div>
+        <div style="grid-column:1/-1"><label>ชื่อสินค้า / Description *</label><input class="fi" id="ai-desc" placeholder="ชื่อสินค้า"></div>
+      </div>
+      <div id="ai-msg" style="font-size:.76rem;font-weight:600;margin-bottom:8px"></div>
+      <div class="purge-bar"><button class="btn-purge" style="background:var(--primary)" onclick="aiSave()">💾 บันทึก Item</button><button class="btn-purge-sec" onclick="aiClear()">ล้างฟอร์ม</button></div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">รายการ Item ที่เพิ่มด้วยตนเอง <span id="ai-count" style="font-weight:400;color:var(--text3);font-size:.72rem"></span></div>
+      <input class="fi" id="ai-search" placeholder="ค้นหารหัส / ชื่อ..." oninput="renderCustomItems()" style="max-width:300px;margin-bottom:10px">
+      <div style="overflow-x:auto"><table class="store-table"><thead><tr><th>รหัส</th><th>Dept</th><th>Class</th><th>ชื่อสินค้า</th><th class="r">ราคา</th><th>เพิ่มโดย</th><th></th></tr></thead><tbody id="ai-tbody"></tbody></table></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ DASHBOARD PAGE ═══ -->
@@ -971,20 +1063,26 @@
 
     <!-- KPI -->
     <div class="kpi-grid">
-      <div class="kpi-card c-blue"><div class="kpi-stripe"></div><div class="kpi-icon">📦</div><div class="kpi-label">รายการทั้งหมด</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-sub">รายการสินค้า</div></div>
-      <div class="kpi-card c-teal"><div class="kpi-stripe"></div><div class="kpi-icon">🏬</div><div class="kpi-label">จำนวน Store</div><div class="kpi-value" id="kpi-stores">0</div><div class="kpi-sub">สาขา</div></div>
-      <div class="kpi-card c-green"><div class="kpi-stripe"></div><div class="kpi-icon">🔢</div><div class="kpi-label">Count รวม</div><div class="kpi-value" id="kpi-count">0</div><div class="kpi-sub">หน่วย</div></div>
-      <div class="kpi-card c-purple"><div class="kpi-stripe"></div><div class="kpi-icon">💰</div><div class="kpi-label">มูลค่าที่นับ</div><div class="kpi-value sm" id="kpi-val-count">฿0</div><div class="kpi-sub">Count × ราคา</div></div>
-      <div class="kpi-card c-amber"><div class="kpi-stripe"></div><div class="kpi-icon">🏷️</div><div class="kpi-label">มูลค่าในระบบ</div><div class="kpi-value sm" id="kpi-val-sys">฿0</div><div class="kpi-sub">Com × ราคา</div></div>
-      <div class="kpi-card c-red"><div class="kpi-stripe"></div><div class="kpi-icon">⚡</div><div class="kpi-label">มูลค่า Diff รวม</div><div class="kpi-value sm" id="kpi-diff-val">฿0</div><div class="kpi-sub">ส่วนต่างสุทธิ</div></div>
+      <div class="kpi-card c-blue drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">📦</div><div class="kpi-label">รายการทั้งหมด</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-sub">รายการสินค้า</div></div>
+      <div class="kpi-card c-teal drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">🏬</div><div class="kpi-label">จำนวน Store</div><div class="kpi-value" id="kpi-stores">0</div><div class="kpi-sub">สาขา</div></div>
+      <div class="kpi-card c-green drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">🔢</div><div class="kpi-label">Count รวม</div><div class="kpi-value" id="kpi-count">0</div><div class="kpi-sub">หน่วย</div></div>
+      <div class="kpi-card c-purple drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">💰</div><div class="kpi-label">มูลค่าที่นับ</div><div class="kpi-value sm" id="kpi-val-count">฿0</div><div class="kpi-sub">Count × ราคา</div></div>
+      <div class="kpi-card c-amber drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">🏷️</div><div class="kpi-label">มูลค่าในระบบ</div><div class="kpi-value sm" id="kpi-val-sys">฿0</div><div class="kpi-sub">Com × ราคา</div></div>
+      <div class="kpi-card c-red drill" data-drill='{}'><div class="kpi-stripe"></div><div class="kpi-icon">⚡</div><div class="kpi-label">มูลค่า Diff รวม</div><div class="kpi-value sm" id="kpi-diff-val">฿0</div><div class="kpi-sub">ส่วนต่างสุทธิ</div></div>
     </div>
 
     <!-- ① Regional Summary (full width) -->
     <div class="chart-card" style="margin-bottom:14px">
-      <div class="card-title">🌏 Regional Summary</div>
+      <div class="card-title">🌏 Regional Summary<span class="drill-hint">👆 คลิกการ์ด/แถว/กราฟ เพื่อเปิดรายละเอียดทันที</span></div>
       <div class="regional-grid" id="regional-grid">
         <div class="empty-state" style="padding:16px;grid-column:1/-1"><p>ยังไม่มีข้อมูล</p></div>
       </div>
+    </div>
+
+    <!-- ①.5 Position Summary (ซ่อนไว้ — ข้อมูลเดียวกันอยู่ในเมนู "สถานะการบันทึก"; ลบ display:none เพื่อแสดงอีกครั้ง) -->
+    <div class="chart-card" id="position-summary-card" style="display:none;margin-bottom:14px">
+      <div class="card-title">👤 Position (SOA / Inven) แยกตาม Regional<span class="drill-hint">👆 คลิกเพื่อดูรายการของ Position นั้น</span></div>
+      <div id="position-summary"></div>
     </div>
 
     <!-- ② TOP 5: Neg + Pos (side by side) -->
@@ -1084,25 +1182,25 @@
               <text x="18" y="21.5" text-anchor="middle" dominant-baseline="central" fill="#94a3b8" font-family="'IBM Plex Sans Thai','IBM Plex Sans',sans-serif" font-size="2.8" id="donut-sub">รายการ</text>
             </svg>
             <div class="donut-legend">
-              <div class="leg-item">
+              <div class="leg-item drill" data-drill='{"status":"Match"}'>
                 <div class="leg-dot" style="background:#059669"></div>
                 <span class="leg-label">Match</span>
                 <span class="leg-val" id="leg-match">0</span>
                 <span class="leg-pct" id="pct-match"></span>
               </div>
-              <div class="leg-item">
+              <div class="leg-item drill" data-drill='{"status":"Over"}'>
                 <div class="leg-dot" style="background:#d97706"></div>
                 <span class="leg-label">Over</span>
                 <span class="leg-val" id="leg-over">0</span>
                 <span class="leg-pct" id="pct-over"></span>
               </div>
-              <div class="leg-item">
+              <div class="leg-item drill" data-drill='{"status":"Short"}'>
                 <div class="leg-dot" style="background:#dc2626"></div>
                 <span class="leg-label">Short</span>
                 <span class="leg-val" id="leg-short">0</span>
                 <span class="leg-pct" id="pct-short"></span>
               </div>
-              <div class="leg-item">
+              <div class="leg-item drill" data-drill='{"status":"Pending"}'>
                 <div class="leg-dot" style="background:#7c3aed"></div>
                 <span class="leg-label">Pending</span>
                 <span class="leg-val" id="leg-pending">0</span>
@@ -1114,10 +1212,10 @@
           <div class="status-bar-wrap">
             <div class="status-bar-label">สัดส่วนสถานะ (%)</div>
             <div class="status-bar" id="status-bar">
-              <div class="status-bar-seg match-seg" id="bar-match" style="flex:0"></div>
-              <div class="status-bar-seg over-seg" id="bar-over" style="flex:0"></div>
-              <div class="status-bar-seg short-seg" id="bar-short" style="flex:0"></div>
-              <div class="status-bar-seg pending-seg" id="bar-pending" style="flex:0"></div>
+              <div class="status-bar-seg match-seg drill" id="bar-match" data-drill='{"status":"Match"}' style="flex:0"></div>
+              <div class="status-bar-seg over-seg drill" id="bar-over" data-drill='{"status":"Over"}' style="flex:0"></div>
+              <div class="status-bar-seg short-seg drill" id="bar-short" data-drill='{"status":"Short"}' style="flex:0"></div>
+              <div class="status-bar-seg pending-seg drill" id="bar-pending" data-drill='{"status":"Pending"}' style="flex:0"></div>
             </div>
           </div>
           <!-- Dept Diff Bar Chart (inside same card) -->
@@ -1148,6 +1246,9 @@
         </button>
       </div>
     </div>
+    <div id="drill-banner"><span class="db-txt" id="drill-banner-txt"></span>
+      <button class="pri" onclick="showPage('dashboard')">← กลับ Dashboard</button>
+      <button onclick="clearDrill()">ล้างตัวกรอง</button></div>
     <!-- Items Filter Bar -->
     <div class="items-filter-bar">
       <!-- Row 1: Search + Date Range + Regional + Store -->
@@ -1172,7 +1273,7 @@
         </div>
         <select class="filter-sel" id="filter-regional" onchange="onItemsRegionalChange()"><option value="">All Regional</option></select>
         <select class="filter-sel" id="filter-store" onchange="renderTable()"><option value="">All Store</option></select>
-        <select class="filter-sel" id="filter-zone" onchange="renderTable()"><option value="">All Zone</option></select>
+        <select class="filter-sel" id="filter-zone" onchange="renderTable()"><option value="">All Position</option></select>
       </div>
       <!-- Row 2: Dept + Class + Status + Clear -->
       <div class="items-filter-row">
@@ -1300,7 +1401,7 @@
             style="background:#f8fafc;cursor:default;caret-color:transparent">
         </div>
         <div class="field">
-          <label>Zone *</label>
+          <label>Position (ผู้ตรวจ) *</label>
           <input class="fi" id="f-zone" placeholder="ขึ้นอัตโนมัติจาก Store No." readonly
             style="background:#f8fafc;cursor:default;caret-color:transparent">
         </div>
@@ -1388,10 +1489,10 @@
    ════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════
-   STORE LOOKUP TABLE  (จาก DATA_REG.xlsm · 165 สาขา)
-   key = เลข Store 3 หลัก  →  { regional, zone }
+   STORE LOOKUP TABLE  (อัปเดตจาก Data_New.xlsx · 165 สาขา · Position = SOA 1-17 / Inven 1-15)
+   key = เลข Store 3 หลัก  →  { regional, zone }  (zone = Position ผู้ตรวจที่รับผิดชอบ)
 ══════════════════════════════════════════ */
-const STORE_LOOKUP = {"001": {"regional": "Regional 2", "zone": "Zone9"}, "002": {"regional": "Regional 2", "zone": "Zone9"}, "003": {"regional": "Regional 2", "zone": "Zone10"}, "004": {"regional": "Regional 2", "zone": "Zone6"}, "005": {"regional": "Regional 3", "zone": "Zone13"}, "006": {"regional": "Regional 1", "zone": "Zone1"}, "007": {"regional": "Regional 3", "zone": "Zone11"}, "008": {"regional": "Regional 3", "zone": "Zone12"}, "009": {"regional": "Regional 4", "zone": "Zone17"}, "010": {"regional": "Regional 1", "zone": "Zone3"}, "011": {"regional": "Regional 1", "zone": "Zone2"}, "012": {"regional": "Regional 1", "zone": "Zone4"}, "013": {"regional": "Regional 4", "zone": "Zone16"}, "014": {"regional": "Regional 3", "zone": "Zone11"}, "015": {"regional": "Regional 3", "zone": "Zone14"}, "016": {"regional": "Regional 1", "zone": "Zone5"}, "017": {"regional": "Regional 2", "zone": "Zone7"}, "018": {"regional": "Regional 2", "zone": "Zone8"}, "019": {"regional": "Regional 2", "zone": "Zone6"}, "020": {"regional": "Regional 3", "zone": "Zone11"}, "021": {"regional": "Regional 2", "zone": "Zone7"}, "022": {"regional": "Regional 4", "zone": "Zone17"}, "023": {"regional": "Regional 1", "zone": "Zone1"}, "024": {"regional": "Regional 1", "zone": "Zone3"}, "025": {"regional": "Regional 1", "zone": "Zone5"}, "026": {"regional": "Regional 3", "zone": "Zone14"}, "027": {"regional": "Regional 4", "zone": "Zone16"}, "028": {"regional": "Regional 1", "zone": "Zone4"}, "029": {"regional": "Regional 4", "zone": "Zone17"}, "030": {"regional": "Regional 3", "zone": "Zone12"}, "031": {"regional": "Regional 4", "zone": "Zone17"}, "032": {"regional": "Regional 3", "zone": "Zone11"}, "033": {"regional": "Regional 3", "zone": "Zone11"}, "034": {"regional": "Regional 1", "zone": "Zone1"}, "035": {"regional": "Regional 4", "zone": "Zone16"}, "036": {"regional": "Regional 4", "zone": "Zone15"}, "037": {"regional": "Regional 1", "zone": "Zone4"}, "038": {"regional": "Regional 1", "zone": "Zone5"}, "039": {"regional": "Regional 4", "zone": "Zone15"}, "040": {"regional": "Regional 3", "zone": "Zone13"}, "041": {"regional": "Regional 1", "zone": "Zone1"}, "042": {"regional": "Regional 2", "zone": "Zone9"}, "043": {"regional": "Regional 4", "zone": "Zone15"}, "044": {"regional": "Regional 3", "zone": "Zone14"}, "045": {"regional": "Regional 1", "zone": "Zone2"}, "046": {"regional": "Regional 2", "zone": "Zone6"}, "047": {"regional": "Regional 1", "zone": "Zone5"}, "048": {"regional": "Regional 1", "zone": "Zone3"}, "049": {"regional": "Regional 2", "zone": "Zone6"}, "050": {"regional": "Regional 1", "zone": "Zone1"}, "051": {"regional": "Regional 3", "zone": "Zone12"}, "052": {"regional": "Regional 1", "zone": "Zone2"}, "053": {"regional": "Regional 4", "zone": "Zone15"}, "054": {"regional": "Regional 3", "zone": "Zone12"}, "055": {"regional": "Regional 1", "zone": "Zone3"}, "056": {"regional": "Regional 1", "zone": "Zone5"}, "057": {"regional": "Regional 2", "zone": "Zone8"}, "058": {"regional": "Regional 1", "zone": "Zone3"}, "059": {"regional": "Regional 4", "zone": "Zone17"}, "060": {"regional": "Regional 3", "zone": "Zone14"}, "061": {"regional": "Regional 1", "zone": "Zone4"}, "062": {"regional": "Regional 4", "zone": "Zone16"}, "063": {"regional": "Regional 1", "zone": "Zone3"}, "064": {"regional": "Regional 4", "zone": "Zone17"}, "065": {"regional": "Regional 1", "zone": "Zone3"}, "066": {"regional": "Regional 3", "zone": "Zone14"}, "067": {"regional": "Regional 1", "zone": "Zone1"}, "068": {"regional": "Regional 2", "zone": "Zone6"}, "069": {"regional": "Regional 4", "zone": "Zone16"}, "070": {"regional": "Regional 1", "zone": "Zone2"}, "071": {"regional": "Regional 4", "zone": "Zone16"}, "072": {"regional": "Regional 2", "zone": "Zone6"}, "073": {"regional": "Regional 1", "zone": "Zone2"}, "074": {"regional": "Regional 1", "zone": "Zone5"}, "075": {"regional": "Regional 4", "zone": "Zone16"}, "076": {"regional": "Regional 4", "zone": "Zone15"}, "077": {"regional": "Regional 4", "zone": "Zone17"}, "078": {"regional": "Regional 2", "zone": "Zone8"}, "079": {"regional": "Regional 1", "zone": "Zone4"}, "080": {"regional": "Regional 1", "zone": "Zone4"}, "081": {"regional": "Regional 1", "zone": "Zone1"}, "082": {"regional": "Regional 3", "zone": "Zone12"}, "083": {"regional": "Regional 2", "zone": "Zone7"}, "084": {"regional": "Regional 3", "zone": "Zone14"}, "085": {"regional": "Regional 4", "zone": "Zone17"}, "086": {"regional": "Regional 2", "zone": "Zone10"}, "087": {"regional": "Regional 1", "zone": "Zone1"}, "089": {"regional": "Regional 1", "zone": "Zone2"}, "096": {"regional": "Regional 2", "zone": "Zone10"}, "100": {"regional": "Regional 1", "zone": "Zone2"}, "101": {"regional": "Regional 3", "zone": "Zone14"}, "102": {"regional": "Regional 3", "zone": "Zone11"}, "103": {"regional": "Regional 1", "zone": "Zone2"}, "104": {"regional": "Regional 4", "zone": "Zone16"}, "105": {"regional": "Regional 4", "zone": "Zone16"}, "106": {"regional": "Regional 3", "zone": "Zone11"}, "107": {"regional": "Regional 1", "zone": "Zone3"}, "108": {"regional": "Regional 3", "zone": "Zone13"}, "109": {"regional": "Regional 3", "zone": "Zone13"}, "110": {"regional": "Regional 4", "zone": "Zone15"}, "111": {"regional": "Regional 2", "zone": "Zone6"}, "112": {"regional": "Regional 2", "zone": "Zone8"}, "113": {"regional": "Regional 2", "zone": "Zone9"}, "114": {"regional": "Regional 1", "zone": "Zone5"}, "115": {"regional": "Regional 2", "zone": "Zone7"}, "116": {"regional": "Regional 1", "zone": "Zone4"}, "117": {"regional": "Regional 2", "zone": "Zone10"}, "118": {"regional": "Regional 2", "zone": "Zone9"}, "119": {"regional": "Regional 1", "zone": "Zone5"}, "120": {"regional": "Regional 2", "zone": "Zone7"}, "121": {"regional": "Regional 2", "zone": "Zone9"}, "122": {"regional": "Regional 2", "zone": "Zone8"}, "123": {"regional": "Regional 2", "zone": "Zone8"}, "124": {"regional": "Regional 2", "zone": "Zone9"}, "125": {"regional": "Regional 4", "zone": "Zone15"}, "126": {"regional": "Regional 2", "zone": "Zone10"}, "127": {"regional": "Regional 2", "zone": "Zone8"}, "128": {"regional": "Regional 3", "zone": "Zone12"}, "129": {"regional": "Regional 3", "zone": "Zone13"}, "130": {"regional": "Regional 3", "zone": "Zone12"}, "131": {"regional": "Regional 3", "zone": "Zone14"}, "132": {"regional": "Regional 3", "zone": "Zone14"}, "133": {"regional": "Regional 2", "zone": "Zone10"}, "134": {"regional": "Regional 3", "zone": "Zone13"}, "135": {"regional": "Regional 2", "zone": "Zone8"}, "136": {"regional": "Regional 1", "zone": "Zone4"}, "137": {"regional": "Regional 2", "zone": "Zone10"}, "138": {"regional": "Regional 2", "zone": "Zone10"}, "139": {"regional": "Regional 2", "zone": "Zone10"}, "140": {"regional": "Regional 2", "zone": "Zone7"}, "141": {"regional": "Regional 3", "zone": "Zone12"}, "142": {"regional": "Regional 2", "zone": "Zone8"}, "143": {"regional": "Regional 2", "zone": "Zone9"}, "144": {"regional": "Regional 3", "zone": "Zone12"}, "145": {"regional": "Regional 2", "zone": "Zone7"}, "146": {"regional": "Regional 1", "zone": "Zone2"}, "147": {"regional": "Regional 2", "zone": "Zone9"}, "148": {"regional": "Regional 3", "zone": "Zone13"}, "149": {"regional": "Regional 2", "zone": "Zone6"}, "150": {"regional": "Regional 2", "zone": "Zone7"}, "151": {"regional": "Regional 2", "zone": "Zone9"}, "152": {"regional": "Regional 2", "zone": "Zone6"}, "153": {"regional": "Regional 4", "zone": "Zone17"}, "154": {"regional": "Regional 3", "zone": "Zone12"}, "155": {"regional": "Regional 2", "zone": "Zone7"}, "156": {"regional": "Regional 2", "zone": "Zone8"}, "157": {"regional": "Regional 3", "zone": "Zone11"}, "158": {"regional": "Regional 1", "zone": "Zone5"}, "159": {"regional": "Regional 1", "zone": "Zone3"}, "160": {"regional": "Regional 2", "zone": "Zone6"}, "161": {"regional": "Regional 1", "zone": "Zone4"}, "162": {"regional": "Regional 3", "zone": "Zone13"}, "163": {"regional": "Regional 4", "zone": "Zone17"}, "164": {"regional": "Regional 1", "zone": "Zone5"}, "165": {"regional": "Regional 2", "zone": "Zone10"}, "166": {"regional": "Regional 4", "zone": "Zone16"}, "167": {"regional": "Regional 1", "zone": "Zone1"}, "168": {"regional": "Regional 3", "zone": "Zone13"}, "169": {"regional": "Regional 4", "zone": "Zone15"}, "170": {"regional": "Regional 3", "zone": "Zone11"}, "171": {"regional": "Regional 3", "zone": "Zone11"}, "172": {"regional": "Regional 1", "zone": "Zone4"}, "175": {"regional": "Regional 2", "zone": "Zone8"}, "301": {"regional": "Regional 2", "zone": "Zone7"}, "303": {"regional": "Regional 1", "zone": "Zone1"}};
+const STORE_LOOKUP = {"001": {"regional": "Regional 2", "zone": "Inven 5"}, "002": {"regional": "Regional 2", "zone": "SOA 9"}, "003": {"regional": "Regional 2", "zone": "SOA 10"}, "004": {"regional": "Regional 2", "zone": "Inven 7"}, "005": {"regional": "Regional 3", "zone": "SOA 13"}, "006": {"regional": "Regional 1", "zone": "SOA 1"}, "007": {"regional": "Regional 3", "zone": "Inven 11"}, "008": {"regional": "Regional 2", "zone": "Inven 9"}, "009": {"regional": "Regional 4", "zone": "SOA 17"}, "010": {"regional": "Regional 1", "zone": "SOA 3"}, "011": {"regional": "Regional 1", "zone": "SOA 2"}, "012": {"regional": "Regional 1", "zone": "SOA 4"}, "013": {"regional": "Regional 4", "zone": "SOA 16"}, "014": {"regional": "Regional 3", "zone": "SOA 11"}, "015": {"regional": "Regional 3", "zone": "SOA 14"}, "016": {"regional": "Regional 1", "zone": "SOA 5"}, "017": {"regional": "Regional 2", "zone": "SOA 7"}, "018": {"regional": "Regional 2", "zone": "SOA 8"}, "019": {"regional": "Regional 2", "zone": "SOA 6"}, "020": {"regional": "Regional 3", "zone": "Inven 13"}, "021": {"regional": "Regional 2", "zone": "Inven 6"}, "022": {"regional": "Regional 4", "zone": "SOA 17"}, "023": {"regional": "Regional 1", "zone": "SOA 1"}, "024": {"regional": "Regional 1", "zone": "SOA 3"}, "025": {"regional": "Regional 1", "zone": "SOA 5"}, "026": {"regional": "Regional 3", "zone": "SOA 14"}, "027": {"regional": "Regional 4", "zone": "SOA 16"}, "028": {"regional": "Regional 1", "zone": "SOA 4"}, "029": {"regional": "Regional 4", "zone": "SOA 17"}, "030": {"regional": "Regional 3", "zone": "SOA 13"}, "031": {"regional": "Regional 4", "zone": "SOA 16"}, "032": {"regional": "Regional 3", "zone": "Inven 13"}, "033": {"regional": "Regional 3", "zone": "SOA 11"}, "034": {"regional": "Regional 1", "zone": "SOA 1"}, "035": {"regional": "Regional 4", "zone": "Inven 15"}, "036": {"regional": "Regional 4", "zone": "SOA 15"}, "037": {"regional": "Regional 1", "zone": "SOA 4"}, "038": {"regional": "Regional 1", "zone": "Inven 3"}, "039": {"regional": "Regional 4", "zone": "SOA 15"}, "040": {"regional": "Regional 3", "zone": "SOA 13"}, "041": {"regional": "Regional 1", "zone": "SOA 1"}, "042": {"regional": "Regional 2", "zone": "SOA 7"}, "043": {"regional": "Regional 4", "zone": "SOA 15"}, "044": {"regional": "Regional 3", "zone": "SOA 14"}, "045": {"regional": "Regional 1", "zone": "SOA 2"}, "046": {"regional": "Regional 2", "zone": "SOA 6"}, "047": {"regional": "Regional 1", "zone": "SOA 5"}, "048": {"regional": "Regional 1", "zone": "SOA 3"}, "049": {"regional": "Regional 2", "zone": "SOA 6"}, "050": {"regional": "Regional 1", "zone": "Inven 2"}, "051": {"regional": "Regional 3", "zone": "SOA 12"}, "052": {"regional": "Regional 1", "zone": "SOA 2"}, "053": {"regional": "Regional 4", "zone": "SOA 15"}, "054": {"regional": "Regional 3", "zone": "SOA 12"}, "055": {"regional": "Regional 1", "zone": "SOA 3"}, "056": {"regional": "Regional 1", "zone": "SOA 5"}, "057": {"regional": "Regional 2", "zone": "SOA 8"}, "058": {"regional": "Regional 1", "zone": "SOA 3"}, "059": {"regional": "Regional 4", "zone": "SOA 17"}, "060": {"regional": "Regional 3", "zone": "SOA 14"}, "061": {"regional": "Regional 1", "zone": "SOA 4"}, "062": {"regional": "Regional 4", "zone": "SOA 16"}, "063": {"regional": "Regional 1", "zone": "SOA 3"}, "064": {"regional": "Regional 4", "zone": "Inven 14"}, "065": {"regional": "Regional 1", "zone": "SOA 3"}, "066": {"regional": "Regional 3", "zone": "SOA 13"}, "067": {"regional": "Regional 1", "zone": "SOA 1"}, "068": {"regional": "Regional 2", "zone": "SOA 6"}, "069": {"regional": "Regional 4", "zone": "SOA 17"}, "070": {"regional": "Regional 1", "zone": "SOA 2"}, "071": {"regional": "Regional 4", "zone": "SOA 16"}, "072": {"regional": "Regional 2", "zone": "Inven 8"}, "073": {"regional": "Regional 1", "zone": "SOA 2"}, "074": {"regional": "Regional 1", "zone": "Inven 3"}, "075": {"regional": "Regional 4", "zone": "SOA 16"}, "076": {"regional": "Regional 4", "zone": "SOA 15"}, "077": {"regional": "Regional 4", "zone": "SOA 16"}, "078": {"regional": "Regional 2", "zone": "SOA 8"}, "079": {"regional": "Regional 1", "zone": "SOA 4"}, "080": {"regional": "Regional 1", "zone": "SOA 4"}, "081": {"regional": "Regional 1", "zone": "SOA 1"}, "082": {"regional": "Regional 3", "zone": "SOA 12"}, "083": {"regional": "Regional 2", "zone": "SOA 7"}, "084": {"regional": "Regional 3", "zone": "SOA 14"}, "085": {"regional": "Regional 4", "zone": "SOA 17"}, "086": {"regional": "Regional 2", "zone": "SOA 10"}, "087": {"regional": "Regional 1", "zone": "Inven 1"}, "089": {"regional": "Regional 1", "zone": "SOA 2"}, "096": {"regional": "Regional 2", "zone": "SOA 10"}, "100": {"regional": "Regional 1", "zone": "SOA 2"}, "101": {"regional": "Regional 3", "zone": "SOA 14"}, "102": {"regional": "Regional 3", "zone": "SOA 11"}, "103": {"regional": "Regional 1", "zone": "Inven 1"}, "104": {"regional": "Regional 4", "zone": "Inven 15"}, "105": {"regional": "Regional 4", "zone": "SOA 16"}, "106": {"regional": "Regional 3", "zone": "SOA 11"}, "107": {"regional": "Regional 1", "zone": "SOA 3"}, "108": {"regional": "Regional 3", "zone": "SOA 12"}, "109": {"regional": "Regional 3", "zone": "SOA 13"}, "110": {"regional": "Regional 4", "zone": "SOA 15"}, "111": {"regional": "Regional 2", "zone": "Inven 7"}, "112": {"regional": "Regional 2", "zone": "SOA 8"}, "113": {"regional": "Regional 2", "zone": "SOA 9"}, "114": {"regional": "Regional 1", "zone": "SOA 5"}, "115": {"regional": "Regional 2", "zone": "SOA 9"}, "116": {"regional": "Regional 1", "zone": "Inven 4"}, "117": {"regional": "Regional 2", "zone": "SOA 10"}, "118": {"regional": "Regional 2", "zone": "SOA 7"}, "119": {"regional": "Regional 1", "zone": "SOA 5"}, "120": {"regional": "Regional 2", "zone": "SOA 9"}, "121": {"regional": "Regional 2", "zone": "SOA 7"}, "122": {"regional": "Regional 2", "zone": "SOA 8"}, "123": {"regional": "Regional 2", "zone": "SOA 8"}, "124": {"regional": "Regional 2", "zone": "Inven 5"}, "125": {"regional": "Regional 4", "zone": "SOA 15"}, "126": {"regional": "Regional 2", "zone": "SOA 10"}, "127": {"regional": "Regional 2", "zone": "SOA 8"}, "128": {"regional": "Regional 3", "zone": "Inven 10"}, "129": {"regional": "Regional 2", "zone": "SOA 10"}, "130": {"regional": "Regional 2", "zone": "SOA 9"}, "131": {"regional": "Regional 3", "zone": "SOA 13"}, "132": {"regional": "Regional 3", "zone": "SOA 14"}, "133": {"regional": "Regional 2", "zone": "SOA 10"}, "134": {"regional": "Regional 3", "zone": "SOA 12"}, "135": {"regional": "Regional 2", "zone": "SOA 8"}, "136": {"regional": "Regional 1", "zone": "SOA 4"}, "137": {"regional": "Regional 2", "zone": "SOA 10"}, "138": {"regional": "Regional 2", "zone": "SOA 10"}, "139": {"regional": "Regional 2", "zone": "SOA 10"}, "140": {"regional": "Regional 2", "zone": "SOA 7"}, "141": {"regional": "Regional 2", "zone": "SOA 9"}, "142": {"regional": "Regional 2", "zone": "SOA 8"}, "143": {"regional": "Regional 2", "zone": "SOA 7"}, "144": {"regional": "Regional 2", "zone": "Inven 9"}, "145": {"regional": "Regional 2", "zone": "SOA 9"}, "146": {"regional": "Regional 1", "zone": "SOA 2"}, "147": {"regional": "Regional 2", "zone": "SOA 9"}, "148": {"regional": "Regional 2", "zone": "SOA 7"}, "149": {"regional": "Regional 2", "zone": "Inven 8"}, "150": {"regional": "Regional 2", "zone": "SOA 9"}, "151": {"regional": "Regional 2", "zone": "SOA 9"}, "152": {"regional": "Regional 2", "zone": "SOA 6"}, "153": {"regional": "Regional 4", "zone": "Inven 14"}, "154": {"regional": "Regional 3", "zone": "SOA 12"}, "155": {"regional": "Regional 2", "zone": "SOA 7"}, "156": {"regional": "Regional 2", "zone": "SOA 8"}, "157": {"regional": "Regional 3", "zone": "Inven 11"}, "158": {"regional": "Regional 1", "zone": "SOA 5"}, "159": {"regional": "Regional 1", "zone": "SOA 3"}, "160": {"regional": "Regional 2", "zone": "SOA 6"}, "161": {"regional": "Regional 1", "zone": "SOA 4"}, "162": {"regional": "Regional 3", "zone": "SOA 12"}, "163": {"regional": "Regional 4", "zone": "SOA 17"}, "164": {"regional": "Regional 1", "zone": "SOA 5"}, "165": {"regional": "Regional 2", "zone": "Inven 6"}, "166": {"regional": "Regional 4", "zone": "SOA 16"}, "167": {"regional": "Regional 1", "zone": "SOA 1"}, "168": {"regional": "Regional 3", "zone": "SOA 13"}, "169": {"regional": "Regional 4", "zone": "Inven 15"}, "170": {"regional": "Regional 3", "zone": "Inven 12"}, "171": {"regional": "Regional 3", "zone": "SOA 11"}, "172": {"regional": "Regional 1", "zone": "SOA 4"}, "175": {"regional": "Regional 2", "zone": "SOA 8"}, "301": {"regional": "Regional 2", "zone": "SOA 7"}, "303": {"regional": "Regional 1", "zone": "Inven 2"}};
 
 /* ══════════════════════════════════════════
    STORE NAME LOOKUP  (จาก DATA.xlsm sheet "เลขสาขา" · 165 สาขา)
@@ -1557,6 +1658,8 @@ async function initFirebase() {
         fbKeys = Object.keys(data);
         items  = fbKeys.map(k => {
           const it = { ...data[k] };
+          it._dbRegional = it.regional; it._dbZone = it.zone;
+          try { const _r = resolveStore(String(it.storeNum || it.store || '').padStart(3,'0')); if (_r) { it.regional = _r.regional; it.zone = _r.zone; } } catch(_) {}
           // Ensure pctDiff is always calculated
           const comV = parseFloat(it.com) || 0;
           const diffV = parseFloat(it.diff) || 0;
@@ -1579,6 +1682,8 @@ async function initFirebase() {
       setDbStatus(true);
       if (currentRole) {
         syncFilters(); reapplyDashFilter(); renderTable();
+        try { renderPurgeMonths(); } catch(_) {}
+        try { renderCoverage(); } catch(_) {}
         const ls = document.getElementById('loading-screen');
         if (ls) ls.classList.add('hidden');
       }
@@ -2183,7 +2288,7 @@ function renderTable() {
       if (dateTo)   parts.push(`ถึง ${new Date(dateTo).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})}`);
       if (fr)     parts.push(`🌏 ${fr}`);
       if (fst)    parts.push(`🏬 ${fst}`);
-      if (fz)     parts.push(`Zone: ${fz}`);
+      if (fz)     parts.push(`Position: ${fz}`);
       if (fdept)  parts.push(`🏷️ Dept: ${fdept}`);
       if (fcls)   parts.push(`📂 Class: ${fcls}`);
       if (fstat)  parts.push(`Status: ${fstat}`);
@@ -2368,12 +2473,19 @@ function _cascadeItemsStore(forceReset) {
   setOpts('filter-store', stores, 'All Store', forceReset);
 }
 
-/* ── Items: cascade Zone จาก Regional ── */
+function posCmp(a,b){
+  const ra=/^inven/i.test(a)?1:0, rb=/^inven/i.test(b)?1:0;
+  if(ra!==rb) return ra-rb;
+  const na=parseInt(String(a).replace(/\D/g,'')), nb=parseInt(String(b).replace(/\D/g,''));
+  if(!isNaN(na)&&!isNaN(nb)&&na!==nb) return na-nb;
+  return String(a).localeCompare(String(b),'th');
+}
+/* ── Items: cascade Position จาก Regional ── */
 function _cascadeItemsZone(forceReset) {
   const reg = (document.getElementById('filter-regional')||{}).value || '';
   const pool = reg ? items.filter(it=>it.regional===reg) : items;
-  const zones = [...new Set(pool.map(it=>it.zone).filter(Boolean))].sort();
-  setOpts('filter-zone', zones, 'All Zone', forceReset);
+  const zones = [...new Set(pool.map(it=>it.zone).filter(Boolean))].sort(posCmp);
+  setOpts('filter-zone', zones, 'All Position', forceReset);
 }
 
 /* ── Items: cascade Dept (All Dept จาก items ทั้งหมด — ไม่ cascade ตาม regional เพราะ dept อิสระ) ── */
@@ -2457,7 +2569,7 @@ function exportExcel() {
     return true;
   });
   if (!data.length) { alert('ไม่มีข้อมูลในตัวกรองที่เลือก'); return; }
-  const headers = ['#','Regional','วันที่บันทึก','Store','Zone','Dept','Class','Item','Description','ราคาสินค้า (฿)','Com','Count','Diff','% Diff','มูลค่า Diff (฿)','Remark','Status','Status2 Remark','แก้ไขล่าสุด','แก้ไขโดย'];
+  const headers = ['#','Regional','วันที่บันทึก','Store','Position','Dept','Class','Item','Description','ราคาสินค้า (฿)','Com','Count','Diff','% Diff','มูลค่า Diff (฿)','Remark','Status','Status2 Remark','แก้ไขล่าสุด','แก้ไขโดย'];
   const rows = data.map((it,i)=>{
     const toThaiDate = iso => {
       if (!iso) return '';
@@ -2713,6 +2825,7 @@ window.reapplyDashFilter = reapplyDashFilter;
 function renderDashboard() {
   // Use filtered set if active, otherwise full items
   const ds = dashFilteredItems !== null ? dashFilteredItems : items;
+  try { renderPositionSummary(ds); } catch(e) { console.error(e); }
 
   const total      = ds.length;
   const stores     = new Set(ds.map(it=>it.storeNum||it.store)).size;
@@ -2751,7 +2864,7 @@ function renderDashboard() {
       const dvColor = d.diffVal>0?'#059669':d.diffVal<0?'#dc2626':'#94a3b8';
       const dvSign  = d.diffVal>=0?'+':'';
       const pct     = (d.valCount/maxRV*100).toFixed(0);
-      return `<div class="regional-card">
+      return `<div class="regional-card${name==='(ไม่ระบุ)'?'':' drill'}"${name==='(ไม่ระบุ)'?'':drAttr({regional:name})}>
         <div class="reg-top"><div class="reg-name"><span class="reg-rank ${rankCls}">${rank}</span>🌏 ${name}</div><div class="reg-pill">${d.items} รายการ</div></div>
         <div class="reg-grid">
           <div class="reg-stat"><div class="reg-stat-lbl">มูลค่าที่นับ</div><div class="reg-stat-val">${fmtB0(d.valCount)}</div></div>
@@ -2766,7 +2879,7 @@ function renderDashboard() {
 
   /* Store Ranking */
   const stm={};
-  ds.forEach(it=>{ const k=it.storeNum||it.store||'(ไม่ระบุ)'; if(!stm[k]) stm[k]={store:k,regional:it.regional||'—',valCount:0,diffVal:0}; stm[k].valCount+=(it.count||0)*(it.price||0); stm[k].diffVal+=(it.diffVal||0); });
+  ds.forEach(it=>{ const k=it.storeNum||it.store||'(ไม่ระบุ)'; if(!stm[k]) stm[k]={store:k,regional:it.regional||'—',zone:it.zone||'',valCount:0,diffVal:0}; stm[k].valCount+=(it.count||0)*(it.price||0); stm[k].diffVal+=(it.diffVal||0); });
   const stList   = Object.values(stm).sort((a,b)=>a.diffVal-b.diffVal);
   const maxAbsDV = Math.max(...stList.map(s=>Math.abs(s.diffVal)),1);
   const stb = document.getElementById('store-tbody');
@@ -2778,9 +2891,9 @@ function renderDashboard() {
       const barPct  = (Math.abs(s.diffVal)/maxAbsDV*100).toFixed(0);
       const barClass= s.diffVal<0?'fill-neg':'fill-pos';
       const rankCls = i===0?'top1':i===1?'top2':i===2?'top3':'';
-      return `<tr>
+      return `<tr class="drill"${drAttr(s.regional&&s.regional!=='—'?{store:s.store,regional:s.regional}:{store:s.store})}>
         <td><span class="rank-badge ${rankCls}">${i+1}</span></td>
-        <td><div class="store-name-cell">${s.store}</div><div class="store-reg-tag">${s.regional}</div></td>
+        <td><div class="store-name-cell">${s.store}</div><div class="store-reg-tag">${s.regional}${s.zone?' · '+s.zone:''}</div></td>
         <td style="font-size:0.73rem;color:var(--text3)" title="${getStoreNameFull(s.store)}">${getStoreName(s.store, s.regional)}</td>
         <td class="r">${fmtB0(s.valCount)}</td>
         <td class="r">
@@ -2853,7 +2966,7 @@ function renderDashboard() {
       ? `<span style="font-size:0.63rem;color:var(--text3);margin-left:4px">(${g.rows} รายการ)</span>`
       : '';
     const safeDesc  = (g.desc||'').replace(/"/g,'&quot;');
-    return `<tr>
+    return `<tr class="drill"${drAttr({store:g.store,q:g.item})}>
       <td><span class="rank-badge ${rankCls}">${i+1}</span></td>
       <td style="font-family:var(--font-mono);font-weight:700;color:var(--accent);font-size:0.78rem;white-space:nowrap">${g.store}</td>
       <td style="font-weight:600;font-size:0.78rem;white-space:nowrap">${g.item}${rowsLabel}</td>
@@ -2929,7 +3042,7 @@ function renderDashboard() {
       const lbl        = fmtNum(d.diffVal);
       /* แสดงข้อความในแท่งถ้ากว้างพอ (>22%) */
       const showInside = barW > 22;
-      return `<div class="dept-bar-row" title="Dept ${d.dept}: ${lbl} · ${d.items} รายการ">
+      return `<div class="dept-bar-row drill"${drAttr({dept:d.dept})} title="Dept ${d.dept}: ${lbl} · ${d.items} รายการ">
         <div class="dept-bar-label">${d.dept}</div>
         <div class="dept-bar-track">
           <div class="dept-bar-fill" style="width:${barW}%;background:${grad}">
@@ -2992,11 +3105,7 @@ function getAllZones() {
   });
   Object.values(ZONE_OVERRIDES).forEach(v => { if(v && v.zone) s.add(v.zone); });
   getCustomZones().forEach(z => s.add(z));
-  return [...s].sort((a,b) => {
-    const na=parseInt(a.replace(/\D/g,'')), nb=parseInt(b.replace(/\D/g,''));
-    if(!isNaN(na)&&!isNaN(nb)) return na-nb;
-    return a.localeCompare(b,'th');
-  });
+  return [...s].sort(posCmp);
 }
 
 async function loadZoneConfig() {
@@ -3024,6 +3133,7 @@ function listenZoneConfig() {
   onValue(ref(db, ZONE_CONFIG_PATH), (snap) => {
     const data = snap.val();
     ZONE_OVERRIDES = (data && typeof data === 'object') ? data : {};
+    try { reapplyStoreMap(); } catch(_) {}
     if (document.getElementById('page-settings')?.classList.contains('active')) {
       renderSettingsTable();
       renderSettingsSummary();
@@ -3199,7 +3309,7 @@ async function saveSettingsChanges() {
     ZONE_OVERRIDES = newOv;
     _settingsChanges = {};
     if(status){ status.className='settings-save-status ok'; status.textContent='✔ บันทึกสำเร็จ! การเปลี่ยนแปลงมีผลแล้ว'; }
-    toast('✔ บันทึก Zone/Regional เรียบร้อย');
+    toast('✔ บันทึก Position/Regional เรียบร้อย');
     renderSettingsTable(); renderSettingsSummary();
     syncFilters(); renderDashboard(); renderTable();
     setTimeout(()=>{ if(status) status.textContent=''; }, 4000);
@@ -3232,8 +3342,8 @@ window.addNewRegional = addNewRegional;
 function addNewZone() {
   const inp = document.getElementById('new-zone-name');
   const val = (inp?.value||'').trim();
-  if(!val){ toast('⚠ กรุณากรอกชื่อ Zone'); return; }
-  if(getAllZones().includes(val)){ toast('⚠ Zone นี้มีอยู่แล้ว'); return; }
+  if(!val){ toast('⚠ กรุณากรอกชื่อ Position'); return; }
+  if(getAllZones().includes(val)){ toast('⚠ Position นี้มีอยู่แล้ว'); return; }
   const arr = getCustomZones(); if(!arr.includes(val)){ arr.push(val); saveCustomZones(arr); }
   if(inp) inp.value='';
   toast(`✔ เพิ่ม ${val} แล้ว`);
@@ -3250,7 +3360,7 @@ function renderRegionalPreview() {
 
 function renderZonePreview() {
   const el = document.getElementById('zone-list-preview'); if(!el) return;
-  el.innerHTML = '<strong>Zone ทั้งหมด:</strong> ' + getAllZones().map(z =>
+  el.innerHTML = '<strong>Position ทั้งหมด:</strong> ' + getAllZones().map(z =>
     `<span style="display:inline-block;padding:1px 8px;background:var(--surface3);border-radius:99px;margin:2px;font-size:0.72rem">${z}</span>`
   ).join('');
 }
@@ -3266,14 +3376,11 @@ function renderSettingsSummary() {
     byReg[reg][zone].push(sn);
   });
   el.innerHTML = Object.keys(byReg).sort().map(reg => {
-    const zones = Object.keys(byReg[reg]).sort((a,b)=>{
-      const na=parseInt(a.replace(/\D/g,'')), nb=parseInt(b.replace(/\D/g,''));
-      if(!isNaN(na)&&!isNaN(nb)) return na-nb; return a.localeCompare(b);
-    });
+    const zones = Object.keys(byReg[reg]).sort(posCmp);
     const total = Object.values(byReg[reg]).flat().length;
     return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px">
       <div style="font-weight:700;font-size:0.85rem;color:#6d28d9;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-        <span>🌏 ${reg}</span><span style="font-size:0.7rem;color:var(--text3);font-weight:400">${total} สาขา · ${zones.length} Zone</span>
+        <span>🌏 ${reg}</span><span style="font-size:0.7rem;color:var(--text3);font-weight:400">${total} สาขา · ${zones.length} Position</span>
       </div>
       ${zones.map(z=>{const ss=byReg[reg][z]; return `<div style="display:flex;align-items:center;gap:6px;margin:3px 0">
         <span style="font-size:0.7rem;color:var(--accent);font-weight:600;min-width:65px">${z}</span>
@@ -3669,6 +3776,402 @@ window.renderSettingsPage = function() {
 };
 
 
+
+/* ══════════════════════════════════════════════════════════════
+   DRILL-DOWN: คลิกข้อมูลบน Dashboard → ไปหน้ารายการที่กรองให้ทันที
+   ══════════════════════════════════════════════════════════════ */
+function drAttr(o){ return ` data-drill='${JSON.stringify(o).replace(/&/g,'&amp;').replace(/'/g,'&#39;')}'`; }
+let _lastDrill = null;
+function drillTo(f) {
+  f = f || {};
+  const g  = id => document.getElementById(id);
+  const dv = id => (g(id) || {}).value || '';
+  const x = {
+    regional: dv('dash-filter-regional'), store: dv('dash-filter-store'),
+    dept: dv('dash-filter-dept'), cls: dv('dash-filter-class'),
+    status: dv('dash-filter-status'), status2: dv('dash-filter-status2'), q: '', zone: ''
+  };
+  if (f.regional !== undefined && f.store === undefined) x.store = '';
+  if (f.dept !== undefined && f.cls === undefined) x.cls = '';
+  Object.assign(x, f);
+  const dFrom = dv('dash-date-from'), dTo = dv('dash-date-to');
+
+  g('search-input').value = x.q || '';
+  g('filter-regional').value = x.regional || '';
+  _cascadeItemsStore(true); _cascadeItemsZone(true);
+  g('filter-store').value = x.store || '';
+  g('filter-zone').value = x.zone || '';
+  const fd = g('filter-dept'); if (fd) { fd.value = x.dept || ''; _cascadeItemsClass(true); }
+  const fc = g('filter-class'); if (fc) fc.value = x.cls || '';
+  g('filter-status').value = x.status || '';
+  const f2 = g('filter-status2'); if (f2) f2.value = x.status2 || '';
+  g('items-date-from').value = dFrom; g('items-date-to').value = dTo;
+
+  window.showPage('items');
+  renderTable();
+
+  const parts = [];
+  if (x.regional) parts.push('Regional: ' + x.regional);
+  if (x.store)    parts.push('Store: ' + x.store + (getStoreName ? ' ' + (getStoreName(x.store, x.regional) || '') : ''));
+  if (x.dept)     parts.push('Dept: ' + x.dept);
+  if (x.cls)      parts.push('Class: ' + x.cls);
+  if (x.status)   parts.push('Status: ' + x.status);
+  if (x.status2)  parts.push('Status2: ' + x.status2);
+  if (x.q)        parts.push('ค้นหา: ' + x.q);
+  if (dFrom || dTo) parts.push('วันที่: ' + (dFrom || '…') + ' ถึง ' + (dTo || '…'));
+  const n = (g('items-count-tag') || {}).textContent || '';
+  g('drill-banner-txt').textContent = '🔎 จาก Dashboard → ' + (parts.join(' · ') || 'ทุกรายการ') + (n ? '  (' + n + ' รายการ)' : '');
+  g('drill-banner').classList.add('show');
+  _lastDrill = x;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.drillTo = drillTo;
+
+function clearDrill() {
+  const g = id => document.getElementById(id);
+  g('search-input').value = '';
+  g('filter-regional').value = '';
+  _cascadeItemsStore(true); _cascadeItemsZone(true);
+  const fd = g('filter-dept'); if (fd) { fd.value = ''; _cascadeItemsClass(true); }
+  g('filter-status').value = '';
+  const f2 = g('filter-status2'); if (f2) f2.value = '';
+  g('items-date-from').value = ''; g('items-date-to').value = '';
+  g('drill-banner').classList.remove('show');
+  renderTable();
+}
+window.clearDrill = clearDrill;
+
+document.addEventListener('click', e => {
+  if (e.target.closest('.col-resizer')) return;
+  const el = e.target.closest('[data-drill]');
+  if (!el) return;
+  try { drillTo(JSON.parse(el.getAttribute('data-drill'))); } catch (err) { console.error(err); }
+});
+
+const _showPageDrill = window.showPage;
+window.showPage = function(page) {
+  _showPageDrill(page);
+  if (page === 'dashboard') { const b = document.getElementById('drill-banner'); if (b) b.classList.remove('show'); }
+  if (page === 'settings') { try { renderPurgeMonths(); } catch(_) {} }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   PURGE: ลบข้อมูลย้อนหลังรายเดือน (Admin)
+   ══════════════════════════════════════════════════════════════ */
+const _TH_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const _NO_DATE = 'ไม่ระบุวันที่';
+function _monthKey(it) {
+  const ts = it.createdAt || it.updatedAt;
+  if (!ts) return _NO_DATE;
+  const d = new Date(ts);
+  if (isNaN(d)) return _NO_DATE;
+  return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' }).slice(0, 7);
+}
+function _monthLabel(k) {
+  if (!/^\d{4}-\d{2}$/.test(k)) return k;
+  const [y, m] = k.split('-');
+  return _TH_MONTHS[+m - 1] + ' ' + (+y + 543);
+}
+function renderPurgeMonths() {
+  try { renderSyncInfo(); } catch(_) {}
+  const box = document.getElementById('purge-months');
+  if (!box) return;
+  const keep = new Set([...box.querySelectorAll('input:checked')].map(i => i.value));
+  const mm = {};
+  items.forEach(it => { const k = _monthKey(it); mm[k] = (mm[k] || 0) + 1; });
+  const keys = Object.keys(mm).sort().reverse();
+  const curKey = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' }).slice(0, 7);
+  box.innerHTML = keys.length ? keys.map(k =>
+    `<label class="purge-item"><input type="checkbox" value="${k}" ${keep.has(k) ? 'checked' : ''} onchange="purgeUpdateSummary()">
+       <span>${_monthLabel(k)}</span>${k === curKey ? '<span class="pm-cur">เดือนปัจจุบัน</span>' : ''}<span class="pm-n">${mm[k].toLocaleString()} รายการ</span></label>`
+  ).join('') : '<span style="font-size:.78rem;color:var(--text3)">ยังไม่มีข้อมูล</span>';
+  purgeUpdateSummary();
+}
+function purgeSelected() { return [...document.querySelectorAll('#purge-months input:checked')].map(i => i.value); }
+function purgeUpdateSummary() {
+  const sel = new Set(purgeSelected());
+  const n = items.filter(it => sel.has(_monthKey(it))).length;
+  const el = document.getElementById('purge-summary');
+  if (el) el.textContent = sel.size ? `เลือก ${sel.size} เดือน · ${n.toLocaleString()} รายการ จากทั้งหมด ${items.length.toLocaleString()}` : `ทั้งหมด ${items.length.toLocaleString()} รายการ`;
+}
+function purgePickAll(on) { document.querySelectorAll('#purge-months input').forEach(c => c.checked = on); purgeUpdateSummary(); }
+function purgePickOlder() {
+  const n = parseInt(document.getElementById('purge-older').value, 10) || 3;
+  const now = new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' }).slice(0, 7) + '-01T00:00:00');
+  now.setMonth(now.getMonth() - n + 1);          // เดือนที่ "เก่ากว่า n เดือน" = ก่อนเดือนนี้ลบ n-1
+  const lim = now.getFullYear() * 12 + now.getMonth();
+  document.querySelectorAll('#purge-months input').forEach(c => {
+    if (!/^\d{4}-\d{2}$/.test(c.value)) { c.checked = false; return; }
+    const [y, m] = c.value.split('-');
+    c.checked = (+y * 12 + (+m - 1)) < lim;
+  });
+  purgeUpdateSummary();
+}
+function purgeBackup(sel) {
+  const S = new Set(sel);
+  const rows = items.filter(it => S.has(_monthKey(it))).map(it => ({
+    วันที่บันทึก: it.createdAt || '', Regional: it.regional || '', Position: it.zone || '', Store: it.storeNum || it.store || '',
+    Dept: it.dept || '', Class: it.cls || '', Item: it.item || '', Description: it.desc || '', Price: it.price, ระบบ: it.com, นับ: it.count,
+    Diff: it.diff, 'Diff Value': it.diffVal, '% Diff': it.pctDiff, Status: it.status || '', Status2: it.status2 || '',
+    Remark: it.remark || '', แก้ไขล่าสุดโดย: it.updatedBy || ''
+  }));
+  if (!rows.length) return 0;
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'Backup');
+  XLSX.writeFile(wb, 'backup_' + [...S].sort().join('_') + '.xlsx');
+  return rows.length;
+}
+function purgeBackupOnly() {
+  const sel = purgeSelected();
+  if (!sel.length) { toast('⚠ กรุณาเลือกเดือนที่ต้องการสำรอง'); return; }
+  const n = purgeBackup(sel);
+  toast(n ? `✔ สำรองข้อมูล ${n.toLocaleString()} รายการแล้ว` : '⚠ ไม่มีข้อมูลในเดือนที่เลือก');
+}
+async function purgeSelectedMonths() {
+  if (currentRole !== 'admin') { toast('⚠ เฉพาะ Admin เท่านั้น'); return; }
+  if (!db || !update) { toast('⚠ ยังไม่ได้เชื่อมต่อฐานข้อมูล — ลบไม่ได้'); return; }
+  const sel = purgeSelected();
+  if (!sel.length) { toast('⚠ กรุณาเลือกเดือนที่ต้องการลบ'); return; }
+  const S = new Set(sel);
+  const keys = [];
+  items.forEach((it, i) => { if (S.has(_monthKey(it)) && fbKeys[i]) keys.push(fbKeys[i]); });
+  if (!keys.length) { toast('⚠ ไม่มีข้อมูลในเดือนที่เลือก'); return; }
+  const names = sel.slice().sort().map(_monthLabel).join(', ');
+  if (!confirm(`ลบข้อมูล ${keys.length.toLocaleString()} รายการ\nเดือน: ${names}\n\nลบแล้วกู้คืนไม่ได้ ต้องการดำเนินการต่อ?`)) return;
+  const t = prompt('พิมพ์คำว่า DELETE เพื่อยืนยันการลบ');
+  if ((t || '').trim().toUpperCase() !== 'DELETE') { toast('ยกเลิกการลบ'); return; }
+  if (document.getElementById('purge-backup').checked) purgeBackup(sel);
+  try {
+    for (let i = 0; i < keys.length; i += 300) {
+      const upd = {};
+      keys.slice(i, i + 300).forEach(k => { upd[`${DB_PATH}/${k}`] = null; });
+      await update(ref(db), upd);
+    }
+    toast(`✔ ลบข้อมูล ${keys.length.toLocaleString()} รายการเรียบร้อย`);
+  } catch (e) { toast('❌ ลบไม่สำเร็จ: ' + e.message); }
+}
+window.renderPurgeMonths = renderPurgeMonths; window.purgeUpdateSummary = purgeUpdateSummary;
+window.purgePickAll = purgePickAll; window.purgePickOlder = purgePickOlder;
+window.purgeBackupOnly = purgeBackupOnly; window.purgeSelectedMonths = purgeSelectedMonths;
+
+/* ══════════════════════════════════════════════════════════════
+   POSITION SUMMARY (Dashboard) + SYNC OLD RECORDS (Settings)
+   ══════════════════════════════════════════════════════════════ */
+const POSITION_DIRECTORY = {"SOA 1": {"name": "พิชิต คันธาเวช", "regional": "Regional 1", "stores": ["006", "023", "034", "041", "067", "081", "167"]}, "SOA 2": {"name": "ธีระพงษ์ อินจุ้มสาย", "regional": "Regional 1", "stores": ["011", "045", "052", "070", "073", "089", "100", "146"]}, "SOA 3": {"name": "มะลิวัลย์ โขงชัยภูมิ", "regional": "Regional 1", "stores": ["010", "024", "048", "055", "058", "063", "065", "107", "159"]}, "SOA 4": {"name": "สุมาลี หาญสว่าง", "regional": "Regional 1", "stores": ["012", "028", "037", "061", "079", "080", "136", "161", "172"]}, "SOA 5": {"name": "ลัดดาวัลย์ ธรรมศร", "regional": "Regional 1", "stores": ["016", "025", "047", "056", "114", "119", "158", "164"]}, "SOA 6": {"name": "ภกรณ์กาญจ์ เมทินีพิศาลกุล", "regional": "Regional 2", "stores": ["019", "046", "049", "068", "152", "160"]}, "SOA 7": {"name": "ธนกร วุฒิเดชเกรียงไกร", "regional": "Regional 2", "stores": ["017", "042", "083", "118", "121", "140", "143", "148", "155", "301"]}, "SOA 8": {"name": "ศุจิกา พงศากาล", "regional": "Regional 2", "stores": ["018", "057", "078", "122", "123", "127", "135", "142", "156", "175"]}, "SOA 9": {"name": "เอกธัช นาวิกบุตร", "regional": "Regional 2", "stores": ["002", "113", "115", "120", "130", "141", "145", "147", "150", "151"]}, "SOA 10": {"name": "อารีย์ นิ่มกลาง", "regional": "Regional 2", "stores": ["003", "086", "096", "117", "126", "129", "133", "137", "138", "139"]}, "SOA 11": {"name": "ณัฐวัฒน์ เดชโนแสงย์", "regional": "Regional 3", "stores": ["014", "033", "102", "106", "171"]}, "SOA 12": {"name": "พจนีย์ กลั่นเขตกิจ", "regional": "Regional 3", "stores": ["051", "054", "082", "108", "134", "154", "162"]}, "SOA 13": {"name": "เสถียร ผลขาว", "regional": "Regional 3", "stores": ["005", "030", "040", "066", "109", "131", "168"]}, "SOA 14": {"name": "รัตวัชร์ พงศ์วัจนาทิน", "regional": "Regional 3", "stores": ["015", "026", "044", "060", "084", "101", "132"]}, "SOA 15": {"name": "วรรณิภา บุญจริง", "regional": "Regional 4", "stores": ["036", "039", "043", "053", "076", "110", "125"]}, "SOA 16": {"name": "บุษรา ไชยเสน", "regional": "Regional 4", "stores": ["013", "027", "031", "062", "071", "075", "077", "105", "166"]}, "SOA 17": {"name": "พงศกร รังษีพลาสวัสดิ์", "regional": "Regional 4", "stores": ["009", "022", "029", "059", "069", "085", "163"]}, "Inven 1": {"name": "ปิยบุตร คำทอง", "regional": "Regional 1", "stores": ["087", "103"]}, "Inven 2": {"name": "เหมรัชต์ ไชยวัง", "regional": "Regional 1", "stores": ["050", "303"]}, "Inven 3": {"name": "วารุณี สีโสพล", "regional": "Regional 1", "stores": ["038", "074"]}, "Inven 4": {"name": "วรพจน์ สุวารัก", "regional": "Regional 1", "stores": ["116"]}, "Inven 5": {"name": "อธิญา แก้วเรือง", "regional": "Regional 2", "stores": ["001", "124"]}, "Inven 6": {"name": "นฤมล บุญยืน", "regional": "Regional 2", "stores": ["021", "165"]}, "Inven 7": {"name": "สุทธิวัฒ เย็นนิกรณ์", "regional": "Regional 2", "stores": ["004", "111"]}, "Inven 8": {"name": "สุพรรณรัตน์ ริมแจ้ง", "regional": "Regional 2", "stores": ["072", "149"]}, "Inven 9": {"name": "พงษ์พิชญ์ เพียรนันท์ถาวร", "regional": "Regional 2", "stores": ["008", "144"]}, "Inven 10": {"name": "สุชีรา ชิตังเม", "regional": "Regional 3", "stores": ["128"]}, "Inven 11": {"name": "อัชราคม จันทรบูรณ์", "regional": "Regional 3", "stores": ["007", "157"]}, "Inven 12": {"name": "ณรงค์ ห้องแซง", "regional": "Regional 3", "stores": ["170"]}, "Inven 13": {"name": "ธนกฤต เจะรัมย์", "regional": "Regional 3", "stores": ["020", "032"]}, "Inven 14": {"name": "บุญนำพา ไหมชุม", "regional": "Regional 4", "stores": ["064", "153"]}, "Inven 15": {"name": "สุวิทย์ เซ่งบุญตั่น", "regional": "Regional 4", "stores": ["035", "104", "169"]}};
+function reapplyStoreMap() {
+  items.forEach(it => {
+    const r = resolveStore(String(it.storeNum || it.store || '').padStart(3, '0'));
+    if (r) { it.regional = r.regional; it.zone = r.zone; }
+  });
+  if (currentRole) { try { syncFilters(); renderDashboard(); renderTable(); renderPurgeMonths(); renderCoverage(); } catch(_) {} }
+}
+function renderPositionSummary(ds) {
+  const box = document.getElementById('position-summary');
+  if (!box) return;
+  const st = {};                                   // stats ต่อ Position
+  ds.forEach(it => {
+    const z = it.zone || '(ไม่ระบุ)';
+    const o = (st[z] = st[z] || { n: 0, dv: 0, vc: 0, byStore: {} });
+    const sn = String(it.storeNum || it.store || '').padStart(3, '0');
+    o.n++; o.dv += (it.diffVal || 0); o.vc += (it.count || 0) * (it.price || 0); o.byStore[sn] = (o.byStore[sn] || 0) + 1;
+  });
+  const byReg = {};
+  Object.keys(POSITION_DIRECTORY).forEach(z => { (byReg[POSITION_DIRECTORY[z].regional] = byReg[POSITION_DIRECTORY[z].regional] || []).push(z); });
+  const extra = Object.keys(st).filter(z => !POSITION_DIRECTORY[z]);        // ค่าที่ไม่อยู่ในตาราง Position
+  const regs = Object.keys(byReg).sort();
+  const unsynced = _syncTargets().length;
+  const warn = unsynced ? `<div style="margin-bottom:10px;padding:8px 12px;border-radius:10px;background:#fef3c7;color:#92400e;font-size:.74rem;font-weight:600">⚠ ${unsynced.toLocaleString()} รายการในฐานข้อมูลยังเก็บ Regional/Position เดิม (Dashboard นี้แสดงตามตารางล่าสุดแล้ว)${currentRole === 'admin' ? ' — ไปที่ Settings เพื่อกดซิงค์ข้อมูลเก่า' : ''}</div>` : '';
+  const fn = v => (v >= 0 ? '+' : '') + fmtB0(v);
+  box.innerHTML = warn + regs.map(r => {
+    const zs = byReg[r].sort(posCmp);
+    const rows = zs.map(z => {
+      const d = POSITION_DIRECTORY[z], o = st[z] || { n: 0, dv: 0, vc: 0, byStore: {} };
+      const col = o.dv > 0 ? '#059669' : o.dv < 0 ? '#dc2626' : '#94a3b8';
+      const chips = d.stores.map(sn => {
+        const c = o.byStore[sn] || 0;
+        return `<span class="drill" data-drill='${JSON.stringify({ store: sn, regional: r })}' title="${c} รายการ" style="display:inline-block;margin:1px 3px 1px 0;padding:1px 8px;border-radius:99px;font-size:.66rem;font-family:var(--font-mono);font-weight:700;background:${c ? 'rgba(5,150,105,.16)' : '#f1f5f9'};color:${c ? '#047857' : '#94a3b8'}">ST${+sn}</span>`;
+      }).join('');
+      return `<tr class="drill"${drAttr({ regional: r, zone: z })}><td style="font-weight:700;white-space:nowrap">${z}</td>
+        <td style="font-size:.74rem;white-space:nowrap">${d.name}</td><td style="min-width:200px">${chips}</td>
+        <td class="r">${Object.keys(o.byStore).length}/${d.stores.length}</td><td class="r">${o.n.toLocaleString()}</td>
+        <td class="r">${fmtB0(o.vc)}</td>
+        <td class="r" style="color:${col};font-family:var(--font-mono);font-weight:700">${fn(o.dv)}</td></tr>`;
+    }).join('');
+    return `<div style="margin-bottom:14px"><div style="font-weight:700;font-size:.82rem;margin:4px 0 6px">🌏 ${r} <span style="font-weight:400;color:var(--text3);font-size:.7rem">· ${zs.length} Position · ${zs.reduce((a, z) => a + POSITION_DIRECTORY[z].stores.length, 0)} สาขา</span></div>
+      <div style="overflow-x:auto"><table class="store-table"><thead><tr><th>Position</th><th>ผู้ตรวจ</th><th>สาขาที่รับผิดชอบ</th><th class="r">Store ที่มีข้อมูล</th><th class="r">รายการ</th><th class="r">มูลค่าที่นับ</th><th class="r">มูลค่า Diff</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join('') + (extra.length ? `<div style="font-size:.72rem;color:var(--text3)">รายการที่ Position ไม่อยู่ในตาราง: ${extra.map(z => z + ' (' + st[z].n + ')').join(', ')}</div>` : '');
+}
+
+function _syncTargets() {
+  const t = [];
+  items.forEach((it, i) => {
+    const sn = String(it.storeNum || it.store || '').padStart(3, '0');
+    const r = resolveStore(sn);
+    if (r && fbKeys[i] && ((it._dbRegional ?? it.regional) !== r.regional || (it._dbZone ?? it.zone) !== r.zone)) t.push({ k: fbKeys[i], r: r.regional, z: r.zone });
+  });
+  return t;
+}
+function renderSyncInfo() {
+  const el = document.getElementById('sync-info'); if (!el) return;
+  const n = _syncTargets().length;
+  el.textContent = n ? `พบ ${n.toLocaleString()} รายการที่ Regional/Position ไม่ตรงกับตารางสาขาล่าสุด` : '✔ ข้อมูลทุกรายการตรงกับตารางสาขาล่าสุดแล้ว';
+}
+async function syncOldRecords() {
+  if (currentRole !== 'admin') { toast('⚠ เฉพาะ Admin เท่านั้น'); return; }
+  if (!db || !update) { toast('⚠ ยังไม่ได้เชื่อมต่อฐานข้อมูล'); return; }
+  const t = _syncTargets();
+  if (!t.length) { toast('✔ ข้อมูลตรงกับตารางสาขาล่าสุดแล้ว'); return; }
+  if (!confirm(`อัปเดต Regional/Position ของ ${t.length.toLocaleString()} รายการ ให้ตรงกับตารางสาขาล่าสุด?`)) return;
+  try {
+    for (let i = 0; i < t.length; i += 150) {
+      const upd = {};
+      t.slice(i, i + 150).forEach(x => { upd[`${DB_PATH}/${x.k}/regional`] = x.r; upd[`${DB_PATH}/${x.k}/zone`] = x.z; });
+      await update(ref(db), upd);
+    }
+    toast(`✔ ซิงค์ ${t.length.toLocaleString()} รายการเรียบร้อย`);
+  } catch (e) { toast('❌ ซิงค์ไม่สำเร็จ: ' + e.message); }
+}
+window.syncOldRecords = syncOldRecords;
+
+/* ══════════════════════════════════════════════════════════════
+   COVERAGE: สถานะการบันทึกรายสาขา (Regional / Position)
+   ══════════════════════════════════════════════════════════════ */
+function _covColor(p) { return p >= 100 ? '#059669' : p >= 50 ? '#d97706' : '#dc2626'; }
+function _covBadge(a, b) { return a >= b && b > 0 ? '<span class="cov-badge done">✔ ครบแล้ว</span>' : a > 0 ? '<span class="cov-badge prog">กำลังดำเนินการ</span>' : '<span class="cov-badge none">ยังไม่เริ่ม</span>'; }
+function renderCoverage() {
+  const pg = document.getElementById('page-coverage');
+  if (!pg || !pg.classList.contains('active')) return;
+  const from = document.getElementById('cov-from').value, to = document.getElementById('cov-to').value;
+  const fMs = from ? new Date(from).setHours(0, 0, 0, 0) : null, tMs = to ? new Date(to).setHours(23, 59, 59, 999) : null;
+  const rec = {};                                    // store -> จำนวนรายการ
+  items.forEach(it => {
+    const ts = it.createdAt || it.updatedAt, t = ts ? new Date(ts).getTime() : null;
+    if ((fMs !== null || tMs !== null) && (t === null || (fMs !== null && t < fMs) || (tMs !== null && t > tMs))) return;
+    const sn = String(it.storeNum || it.store || '').padStart(3, '0');
+    rec[sn] = (rec[sn] || 0) + 1;
+  });
+  const keys = [...new Set([...Object.keys(STORE_LOOKUP), ...Object.keys(ZONE_OVERRIDES || {})])].sort();
+  const reg = {}, pos = {};
+  keys.forEach(sn => {
+    const r = resolveStore(sn); if (!r) return;
+    const done = !!rec[sn];
+    const R = (reg[r.regional] = reg[r.regional] || { t: 0, d: 0 }); R.t++; if (done) R.d++;
+    const P = (pos[r.zone] = pos[r.zone] || { t: 0, d: 0, regional: r.regional, stores: [] }); P.t++; if (done) P.d++; P.stores.push(sn);
+  });
+  const T = keys.length, D = keys.filter(k => rec[k]).length, pct = T ? D / T * 100 : 0;
+  document.getElementById('cov-kpi').innerHTML = `<div class="chart-card" style="margin-bottom:14px"><div style="display:flex;gap:28px;align-items:center;flex-wrap:wrap">
+    <div><div style="font-size:.7rem;font-weight:700;color:var(--text3)">ความคืบหน้ารวมทั้งระบบ</div><div class="cov-pct" style="color:${_covColor(pct)}">${pct.toFixed(1)}%</div></div>
+    <div style="flex:1;min-width:220px"><div class="cov-bar" style="height:16px"><i style="width:${pct}%;background:${_covColor(pct)}"></i></div></div>
+    <div style="font-size:.8rem;line-height:1.7"><span class="cov-chip ok">บันทึกแล้ว ${D} สาขา</span><br><span class="cov-chip no">ยังไม่บันทึก ${T - D} สาขา</span><br><span style="color:var(--text3)">จากทั้งหมด ${T} สาขา</span></div></div></div>`;
+  document.getElementById('cov-regional').innerHTML = Object.keys(reg).sort().map(r => {
+    const o = reg[r], p = o.t ? o.d / o.t * 100 : 0;
+    return `<div class="cov-reg drill"${drAttr({ regional: r })}><div style="display:flex;justify-content:space-between;align-items:center;font-weight:700">🌏 ${r}${_covBadge(o.d, o.t)}</div>
+      <div class="cov-pct" style="color:${_covColor(p)};margin:6px 0">${p.toFixed(1)}%</div><div class="cov-bar"><i style="width:${p}%;background:${_covColor(p)}"></i></div>
+      <div style="font-size:.74rem;margin-top:8px;color:var(--text2)">บันทึกแล้ว <b style="color:#047857">${o.d}</b> · ยังไม่บันทึก <b style="color:#b91c1c">${o.t - o.d}</b> · ทั้งหมด ${o.t} สาขา</div></div>`;
+  }).join('');
+  const onlyPending = document.getElementById('cov-only-pending').checked;
+  const byReg = {};
+  Object.keys(pos).forEach(z => { (byReg[pos[z].regional] = byReg[pos[z].regional] || []).push(z); });
+  document.getElementById('cov-position').innerHTML = Object.keys(byReg).sort().map(r => {
+    const rows = byReg[r].sort(posCmp).filter(z => !onlyPending || pos[z].d < pos[z].t).map(z => {
+      const o = pos[z], p = o.t ? o.d / o.t * 100 : 0, nm = (POSITION_DIRECTORY[z] || {}).name || '';
+      const chips = o.stores.sort().map(sn => rec[sn]
+        ? `<span class="cov-chip ok drill" data-drill='${JSON.stringify({ store: sn, regional: r })}' title="${rec[sn]} รายการ">ST${+sn}</span>`
+        : `<span class="cov-chip no" title="ยังไม่บันทึก">ST${+sn}</span>`).join('');
+      return `<tr><td style="font-weight:700;white-space:nowrap">${z}</td><td style="font-size:.74rem;white-space:nowrap">${nm}</td>
+        <td style="min-width:150px"><div style="display:flex;align-items:center;gap:8px"><div class="cov-bar" style="flex:1"><i style="width:${p}%;background:${_covColor(p)}"></i></div><b style="font-family:var(--font-mono);font-size:.78rem;color:${_covColor(p)}">${p.toFixed(0)}%</b></div></td>
+        <td class="r">${o.d}/${o.t}</td><td>${_covBadge(o.d, o.t)}</td><td style="min-width:220px">${chips}</td></tr>`;
+    }).join('');
+    if (!rows) return '';
+    return `<div style="margin-bottom:14px"><div style="font-weight:700;font-size:.82rem;margin:4px 0 6px">🌏 ${r}</div><div style="overflow-x:auto"><table class="store-table"><thead><tr><th>Position</th><th>ผู้ตรวจ</th><th>ความคืบหน้า</th><th class="r">สาขา</th><th>สถานะ</th><th>สาขาที่รับผิดชอบ</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join('') || '<div class="empty-state" style="padding:14px"><p>ทุก Position บันทึกครบแล้ว 🎉</p></div>';
+}
+window.renderCoverage = renderCoverage;
+
+/* ══════════════════════════════════════════════════════════════
+   ADD NEW ITEM (Admin + User) — เก็บที่ Firebase: soa_custom_items
+   ══════════════════════════════════════════════════════════════ */
+const CUSTOM_ITEMS_PATH = 'soa_custom_items';
+let CUSTOM_ITEMS = {};
+const _baseBackup = {};
+function _applyCustomItems(data) {
+  Object.keys(CUSTOM_ITEMS).forEach(k => { if (k in _baseBackup) { ITEM_DB[k] = _baseBackup[k]; delete _baseBackup[k]; } else delete ITEM_DB[k]; });
+  CUSTOM_ITEMS = (data && typeof data === 'object') ? data : {};
+  Object.keys(CUSTOM_ITEMS).forEach(k => {
+    const v = CUSTOM_ITEMS[k]; if (!v) return;
+    if (ITEM_DB[k] && !(k in _baseBackup)) _baseBackup[k] = ITEM_DB[k];
+    ITEM_DB[k] = { d: String(v.d), c: String(v.c), x: String(v.x), p: parseFloat(v.p) || 0 };
+  });
+  try { renderCustomItems(); } catch (_) {}
+}
+(function waitDbForItems() {
+  const t = setInterval(() => {
+    if (db && onValue) { clearInterval(t); onValue(ref(db, CUSTOM_ITEMS_PATH), snap => _applyCustomItems(snap.val()), err => console.warn('custom items:', err)); }
+  }, 500);
+})();
+function aiGet(id) { return document.getElementById(id).value.trim(); }
+function aiCheckCode() {
+  const c = aiGet('ai-code'), m = document.getElementById('ai-msg');
+  if (!c) { m.textContent = ''; return; }
+  if (CUSTOM_ITEMS[c]) { m.style.color = '#92400e'; m.textContent = '⚠ รหัสนี้เป็น Item ที่เพิ่มเองไว้แล้ว — การบันทึกจะแก้ไขข้อมูลเดิม'; }
+  else if (ITEM_DB[c]) { m.style.color = '#92400e'; m.textContent = `⚠ รหัสนี้มีอยู่แล้วในฐานข้อมูลสินค้า (${ITEM_DB[c].x}) — การบันทึกจะแทนที่ข้อมูลเดิม`; }
+  else { m.style.color = '#059669'; m.textContent = '✔ รหัสใหม่ ใช้งานได้'; }
+}
+function aiClear() { ['ai-code', 'ai-dept', 'ai-class', 'ai-price', 'ai-desc'].forEach(id => document.getElementById(id).value = ''); document.getElementById('ai-msg').textContent = ''; document.getElementById('ai-form-title').textContent = 'รายการสินค้าใหม่'; }
+function aiCanAdd() { return currentRole === 'admin' || currentRole === 'user'; }
+function aiCanModify(code) { return currentRole === 'admin' || (CUSTOM_ITEMS[code] && CUSTOM_ITEMS[code].addedBy === currentUser); }
+async function aiSave() {
+  if (!aiCanAdd()) { toast('⚠ ไม่มีสิทธิ์เพิ่ม Item'); return; }
+  if (!db || !set) { toast('⚠ ยังไม่ได้เชื่อมต่อฐานข้อมูล'); return; }
+  const code = aiGet('ai-code'), d = aiGet('ai-dept'), c = aiGet('ai-class'), x = aiGet('ai-desc'), p = parseFloat(aiGet('ai-price')) || 0;
+  if (!code || !d || !c || !x) { toast('⚠ กรุณากรอก รหัสสินค้า, Dept, Class และชื่อสินค้า'); return; }
+  if (!/^[A-Za-z0-9_-]+$/.test(code)) { toast('⚠ รหัสสินค้าใช้ได้เฉพาะตัวเลข/ตัวอักษร/ขีด'); return; }
+  if (currentRole !== 'admin' && ITEM_DB[code] && !aiCanModify(code)) { toast('⚠ รหัสนี้มีอยู่ในระบบแล้ว — แก้ไขได้เฉพาะ Admin หรือผู้ที่เพิ่มรายการนี้'); return; }
+  if ((ITEM_DB[code]) && !confirm(`รหัส ${code} มีอยู่แล้ว ต้องการแทนที่ข้อมูลเดิมหรือไม่?`)) return;
+  try {
+    await set(ref(db, `${CUSTOM_ITEMS_PATH}/${code}`), { d, c, x, p, addedBy: currentUser || 'admin', addedAt: new Date().toISOString() });
+    toast('✔ บันทึก Item ใหม่เรียบร้อย'); aiClear();
+  } catch (e) { toast('❌ บันทึกไม่สำเร็จ: ' + e.message); }
+}
+function aiEdit(code) {
+  const v = CUSTOM_ITEMS[code]; if (!v) return;
+  if (!aiCanModify(code)) { toast('⚠ แก้ไขได้เฉพาะ Admin หรือผู้ที่เพิ่มรายการนี้'); return; }
+  document.getElementById('ai-code').value = code; document.getElementById('ai-dept').value = v.d; document.getElementById('ai-class').value = v.c;
+  document.getElementById('ai-desc').value = v.x; document.getElementById('ai-price').value = v.p || '';
+  document.getElementById('ai-form-title').textContent = 'แก้ไข Item ' + code; aiCheckCode(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+async function aiDelete(code) {
+  if (!aiCanModify(code) || !db || !remove) { toast('⚠ ลบได้เฉพาะ Admin หรือผู้ที่เพิ่มรายการนี้'); return; }
+  if (!confirm(`ลบ Item ${code} ออกจากระบบ?`)) return;
+  try { await remove(ref(db, `${CUSTOM_ITEMS_PATH}/${code}`)); toast('✔ ลบ Item เรียบร้อย'); } catch (e) { toast('❌ ลบไม่สำเร็จ: ' + e.message); }
+}
+function renderCustomItems() {
+  const tb = document.getElementById('ai-tbody'); if (!tb) return;
+  const q = (document.getElementById('ai-search').value || '').toLowerCase();
+  const ks = Object.keys(CUSTOM_ITEMS).filter(k => !q || (k + ' ' + (CUSTOM_ITEMS[k].x || '')).toLowerCase().includes(q)).sort();
+  document.getElementById('ai-count').textContent = `(${Object.keys(CUSTOM_ITEMS).length} รายการ)`;
+  const esc = t => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  tb.innerHTML = ks.length ? ks.map(k => { const v = CUSTOM_ITEMS[k];
+    return `<tr><td style="font-family:var(--font-mono);font-weight:700">${esc(k)}</td><td>${esc(v.d)}</td><td>${esc(v.c)}</td><td>${esc(v.x)}</td><td class="r">${(+v.p || 0).toLocaleString()}</td><td style="font-size:.7rem;color:var(--text3)">${esc(v.addedBy)}</td>
+      <td style="white-space:nowrap">${aiCanModify(k) ? `<button class="action-btn" onclick="aiEdit('${esc(k)}')">แก้ไข</button> <button class="action-btn" style="color:var(--red-lt)" onclick="aiDelete('${esc(k)}')">ลบ</button>` : ''}</td></tr>`; }).join('')
+    : '<tr><td colspan="7"><div class="empty-state" style="padding:14px"><p>ยังไม่มี Item ที่เพิ่มเอง</p></div></td></tr>';
+}
+Object.assign(window, { aiCheckCode, aiClear, aiSave, aiEdit, aiDelete, renderCustomItems });
+
+/* ── Nav: active tab by data-page, admin-only tabs, page render ── */
+const _showPageCov = window.showPage;
+window.showPage = function(page) {
+  _showPageCov(page);
+  document.querySelectorAll('.nav-tab[data-page]').forEach(t => t.classList.toggle('active', t.dataset.page === page));
+  document.querySelectorAll('.m-tab').forEach(t => t.classList.toggle('active', t.id === 'mtab-' + page));
+  if (page === 'coverage') renderCoverage();
+  if (page === 'additem') { if (!aiCanAdd()) { window.showPage('dashboard'); return; } renderCustomItems(); }
+};
+function refreshAdminTabs() {
+  const a = currentRole === 'admin', u = a || currentRole === 'user';
+  [['nav-tab-additem', u], ['mtab-additem', u], ['nav-tab-settings', a], ['mtab-settings', a]].forEach(([id, on]) => { const e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; });
+}
+setInterval(refreshAdminTabs, 700);
 </script>
 
 <!-- ═══ SETTINGS PAGE ═══ -->
@@ -3676,16 +4179,50 @@ window.renderSettingsPage = function() {
   <div class="settings-page">
     <div class="page-header">
       <div>
-        <h1>⚙️ Settings — Zone, Status2 &amp; User Management</h1>
-        <p>จัดการ Regional, Zone, Status2 Remark และ User (Admin Only)</p>
+        <h1>⚙️ Settings — Position, Status2 &amp; User Management</h1>
+        <p>จัดการ Regional, Position, Status2 Remark และ User (Admin Only)</p>
       </div>
     </div>
 
     <!-- Info Box -->
     <div class="settings-info-box">
-      ℹ️ <strong>วิธีใช้:</strong> เปลี่ยน Regional หรือ Zone ของสาขาใดก็ได้จากตารางด้านล่าง แล้วกด <strong>บันทึกการเปลี่ยนแปลง</strong>
+      ℹ️ <strong>วิธีใช้:</strong> เปลี่ยน Regional หรือ Position (SOA/Inven) ของสาขาใดก็ได้จากตารางด้านล่าง แล้วกด <strong>บันทึกการเปลี่ยนแปลง</strong>
       — ระบบจะ sync ไปยัง Firebase ทันที และมีผลกับการ <em>กรอกข้อมูลใหม่</em> ในทุก session
-      <br>⚠️ ข้อมูลที่บันทึกไปแล้วก่อนหน้านี้จะยังคงมี Regional/Zone เดิม — ต้องแก้ไขผ่านปุ่ม Edit ในหน้ารายการสินค้า
+      <br>⚠️ ข้อมูลที่บันทึกไปแล้วก่อนหน้านี้จะยังคงมี Regional/Position เดิม — ใช้ปุ่ม "ซิงค์ข้อมูลเก่า" ด้านล่างเพื่ออัปเดตทั้งหมดให้ตรงกับตารางสาขาล่าสุด
+    </div>
+
+    <!-- Sync old records to latest Regional/Position (Admin) -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔄 ซิงค์ข้อมูลเก่าให้ตรงกับ Regional / Position ล่าสุด (Admin)</div>
+      <div class="purge-box" style="border-color:#bfdbfe;background:rgba(219,234,254,.35)">
+        <div style="font-size:.78rem;color:var(--text2)">อัปเดตฟิลด์ Regional และ Position ของรายการที่บันทึกไว้แล้ว ให้ตรงกับตารางสาขาปัจจุบัน (รวมค่าที่แก้ในหน้านี้) เพื่อให้ Dashboard แยกตาม Regional/Position ถูกต้อง ไม่แตะข้อมูลอื่น</div>
+        <div class="purge-bar" style="margin-top:10px">
+          <span id="sync-info" style="font-size:.78rem;font-weight:600"></span>
+          <button class="btn-purge" style="background:var(--primary)" onclick="syncOldRecords()">🔄 ซิงค์ข้อมูลเก่าทั้งหมด</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Purge old data (Admin) -->
+    <div class="settings-section">
+      <div class="settings-section-title">🗑️ ล้างข้อมูลย้อนหลังรายเดือน (Admin)</div>
+      <div class="purge-box">
+        <div style="font-size:.78rem;color:var(--text2)">เลือกเดือนที่ต้องการลบออกจากฐานข้อมูลถาวร (นับตามวันที่บันทึก createdAt) — ลบแล้วกู้คืนไม่ได้ แนะนำให้ดาวน์โหลดไฟล์สำรองก่อน</div>
+        <div class="purge-list" id="purge-months"><span style="font-size:.78rem;color:var(--text3)">กำลังโหลด...</span></div>
+        <div class="purge-bar">
+          <span style="font-size:.74rem">เก็บไว้เฉพาะ</span>
+          <select id="purge-older" class="s-sel"><option value="1">1 เดือนล่าสุด</option><option value="2">2 เดือนล่าสุด</option><option value="3" selected>3 เดือนล่าสุด</option><option value="6">6 เดือนล่าสุด</option><option value="12">12 เดือนล่าสุด</option></select>
+          <button class="btn-purge-sec" onclick="purgePickOlder()">เลือกเดือนที่เหลือ (เก่ากว่า)</button>
+          <button class="btn-purge-sec" onclick="purgePickAll(true)">เลือกทั้งหมด</button>
+          <button class="btn-purge-sec" onclick="purgePickAll(false)">ไม่เลือก</button>
+        </div>
+        <div class="purge-bar" style="margin-top:10px">
+          <label style="font-size:.76rem;display:flex;gap:6px;align-items:center"><input type="checkbox" id="purge-backup" checked> ดาวน์โหลดไฟล์สำรอง (Excel) อัตโนมัติก่อนลบ</label>
+          <button class="btn-purge-sec" onclick="purgeBackupOnly()">⬇ สำรองเฉพาะเดือนที่เลือก</button>
+          <button class="btn-purge" onclick="purgeSelectedMonths()">🗑️ ลบข้อมูลเดือนที่เลือก</button>
+          <span id="purge-summary" style="font-size:.74rem;color:var(--text3)"></span>
+        </div>
+      </div>
     </div>
 
     <!-- Zone filter buttons -->
@@ -3706,7 +4243,7 @@ window.renderSettingsPage = function() {
     <!-- Store mapping table -->
     <div class="settings-section">
       <div class="settings-section-title">
-        🏬 รายการสาขาและ Zone/Regional ปัจจุบัน
+        🏬 รายการสาขาและ Position/Regional ปัจจุบัน
         <span id="settings-changed-count" style="display:none" class="settings-badge-changed">● มีการเปลี่ยนแปลง</span>
       </div>
       <div style="overflow:auto;border-radius:10px;border:1px solid var(--border)">
@@ -3716,7 +4253,7 @@ window.renderSettingsPage = function() {
               <th style="width:70px">Store No.</th>
               <th>ชื่อสาขา</th>
               <th style="width:160px">Regional</th>
-              <th style="width:160px">Zone</th>
+              <th style="width:160px">Position</th>
               <th style="width:80px">สถานะ</th>
             </tr>
           </thead>
@@ -3735,8 +4272,8 @@ window.renderSettingsPage = function() {
 
     <!-- Add new Regional/Zone -->
     <div class="settings-section">
-      <div class="settings-section-title">➕ เพิ่ม Regional / Zone ใหม่</div>
-      <p style="font-size:0.8rem;color:var(--text3);margin-bottom:14px">เพิ่มชื่อ Regional หรือ Zone ใหม่ที่ต้องการใช้ในระบบ (จะปรากฏใน dropdown ทันที)</p>
+      <div class="settings-section-title">➕ เพิ่ม Regional / Position ใหม่</div>
+      <p style="font-size:0.8rem;color:var(--text3);margin-bottom:14px">เพิ่มชื่อ Regional หรือ Position ใหม่ที่ต้องการใช้ในระบบ (จะปรากฏใน dropdown ทันที)</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <!-- Add Regional -->
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
@@ -3752,11 +4289,11 @@ window.renderSettingsPage = function() {
         </div>
         <!-- Add Zone -->
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
-          <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">📍 เพิ่ม Zone ใหม่</div>
+          <div style="font-size:0.78rem;font-weight:700;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em">📍 เพิ่ม Position ใหม่</div>
           <div style="display:flex;gap:8px;align-items:flex-end">
             <div style="flex:1">
-              <label style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:4px">ชื่อ Zone (เช่น Zone18)</label>
-              <input type="text" id="new-zone-name" class="s-fi" placeholder="Zone18">
+              <label style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:4px">ชื่อ Position (เช่น SOA 18)</label>
+              <input type="text" id="new-zone-name" class="s-fi" placeholder="SOA 18">
             </div>
             <button class="btn-add-zone" onclick="addNewZone()">+ เพิ่ม</button>
           </div>
@@ -3850,7 +4387,7 @@ window.renderSettingsPage = function() {
 
     <!-- Current config summary -->
     <div class="settings-section">
-      <div class="settings-section-title">📋 สรุป Zone/Regional ที่มีในระบบ</div>
+      <div class="settings-section-title">📋 สรุป Position/Regional ที่มีในระบบ</div>
       <div id="settings-summary-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px"></div>
     </div>
   </div>
